@@ -3,7 +3,8 @@
 //  OregonTrail78
 //
 //  Created by kaon on 5/17/17.
-//  Copyright © 2017 Peter Mikelsons. All rights reserved.
+//
+// Port of Creative Computing May-June 1978 Vol 4 No 3 "Oregon Trail" pp 132 - 139
 //
 
 import Foundation
