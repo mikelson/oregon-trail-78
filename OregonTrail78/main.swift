@@ -143,7 +143,7 @@ func shoot() -> Double {
     print("TYPE \(S$[S6])")
     let start = NSDate()
     let C$ = readLine()
-    let t = start.timeIntervalSinceNow
+    let t = -start.timeIntervalSinceNow
     let B1 = t - Double(D9) + 1
     print(B1)
     print()
@@ -228,485 +228,574 @@ while true {
 // 2 cents per bullet
 B *= 50
 
+// 1190
 print()
 print("MONDAY MARCH 29 1847")
 print()
 
-// Beginning each turn
-if F < 0 {
-    F = 0
-}
-if B < 0 {
-    B = 0
-}
-if C < 0 {
-    C = 0
-}
-if M1 < 0 {
-    M1 = 0
-}
-if F < 13 {
-    print("YOU'D BETTER DO SOME HUNTING OR BUY FOOD AND SOON!!!!")
-}
-F = int(value: F)
-B = int(value: B)
-C = int(value: C)
-M1 = int(value: M1)
-T = int(value: T)
-M = int(value: M)
-
-// M2 • TOTAL MILEAGE UP THROUGH PREVIOUS TURN
-let M2 = M
-
-// sick or injured?
-if S4 == 1 || K8 == 1 {
-    T -= 20
-    if T < 0 {
-        // 5080
-        T = 0
-        print("YOU CAN'T AFFORD A DOCTOR")
-        dieOfLackOfMedicalSupplies()
-    }
-    print("DOCTOR'S BILL IS $20")
-    K8 = 0
-    S4 = 0
-}
-// 1990
-if M9 == 1 {
-    print("TOTAL MILEAGE IS 950")
-    M9 = 0
-} else {
-    print("TOTAL MILEAGE IS \(M)")
-}
-print("FOOD\tBULLETS\tCLOTHING\tMISC. SUPP.\tCASH")
-print("\(F)\t\t\(B)\t\(C)\t\t\t\(M1)\t\t\t\(T)")
-var X: Int
-if X1 != -1 {
-    X1 *= -1
-    print("DO YOU WANT TO (1) STOP AT THE NEXT FORT, (2) HUNT,")
-    print("OR (3) CONTINUE");
-    X = readInt()
-    if X < 1 || X > 3{
-        X = 3
-    }
-} else {
-    print("DO YOU WANT TO (1) HUNT, OR (2) CONTINUE")
-    X = readInt()
-    if X != 1 {
-        X = 2
-    }
-    X += 1
-    if X == 2 && B < 40 {
-        print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
-        X = 3
-    }
-    X1 *= -1
-}
-// 2270 switch
-if X == 1 {
-    // ***STOPPING AT FORT***
-    print("ENTER WHAT YOU WISH TO SPEND ON THE FOLLOWING")
-    func spend() -> Double {
-        var P = readDouble()
-        if P < 0 {
-            // keeping this interesting exploit
-            return P
-        }
-        T -= P
-        if T >= 0 {
-            return P
-        }
-        print("YOU DON'T HAVE THAT MUCH--KEEP YOUR SPENDING DOWN")
-        print("YOU MISS YOUR CHANCE TO SPEND ON THAT ITEM")
-        T += P
-        P = 0
-        return 0
-    }
-    print("FOOD")
-    F += 2 / 3 * spend()
-    print("AMMUNITION")
-    B = int(value: B + 2 / 3 * spend() * 50)
-    print("CLOTHING")
-    C += 2 / 3 * spend()
-    print("MISCELLANEOUS SUPPLIES")
-    M1 += 2 / 3 * spend()
-    M -= 45
-} else if X == 2 {
-    // ***HUNTING***
-    if B < 40 {
-        print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
-        // Basic code is GOTO 2080, which could let you stop at fort, even if it is not a fort turn...
-        // TODO just don't show hunt option if B < 40
-        // for now, just continue...
-    } else {
-        M -= 45
-        // 2580 GOSUB 6140
-        var B1 = shoot()
-        if B1 > 1 {
-            if 100.0 * Double(rand.nextUniform()) < 13.0 * B1 {
-                print("YOU MISSED---AND YOUR DINNER GOT AWAY.....")
-            } else {
-                F += 48 - 2 * B1
-                print("NICE SHOT--RIGHT ON TARGET--GOOD EATIN' TONIGHT!!")
-                B -= 10 + 3 * B1
-            }
-        } else {
-            print("RIGHT BETWEEN THE EYES---YOU GOT A BIG ONE!!!!")
-            print("FULL BELLIES TONIGHT!")
-            F += 52 + RND() * 6
-            B -= 10 + RND() * 4
-        }
-    }
-}
-// 2720 continuing on
-if F < 13 {
-    print("YOU RAN OUT OF FOOD AND STARVED TO DEATH")
-    die()
-}
-// ***EATING***
-var E = 0
-while true {
-    print("DO YOU WANT TO EAT (1) POORLY  (2) MODERATELY")
-    print("OR (3) WELL")
-    E = readInt()
-    if E < 1 || E > 3 {
-        continue
-    }
-    F -= Double(8 + 5 * E)
+// Main Turn Loop
+while (true) {
+    // 1740
+    // ***BEGINNING EACH TURN***
+    // 1750
     if F < 0 {
-        F += Double(8 + 5 * E)
-        print("YOU CAN'T EAT THAT WELL")
-        continue
+        F = 0
     }
-    break
-}
-M += 200 + (A - 220) / 5 + 10 * RND()
-// FLAG FOR BLIZZARD
-var L1 = 0
-// FLAG FOR INSUFFICIENT CLOTHING IN COLD WEATHER
-var C1 = 0
-// ***RIDERS ATTACK***
-let riderMileageSquare = pow(M / 100 - 4, 2)
-if RND() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
-    print("RIDERS AHEAD.  THEY ")
-    var S5 = 0
-    if rand.nextBool() {
-        print("DON'T")
-        S5 = 1
+    if B < 0 {
+        B = 0
     }
-    print("LOOK HOSTILE")
-    print("TACTICS")
-    // T1 = CHOICE OF TACTICS WHEN ATTACKED
-    var T1 = 0
-    while T1 < 1 || T1 > 4 {
-        print("(1) RUN  (2) ATTACK  (3) CONTINUE  (4) CIRCLE WAGONS")
-        if RND() <= 0.2 {
-            S5 = 1 - S5
-        }
-        T1 = readInt()
+    if C < 0 {
+        C = 0
     }
-    if S5 != 1 {
-        func shootRiders(B1: Double) {
-            if B1 <= 1 {
-                print("NICE SHOOTING---YOU DROVE THEM OFF")
-            } else if B1 > 5 {
-                print("LOUSY SHOT---YOU GOT KNIFED")
-                K8 =  1
-                print("YOU HAVE TO SEE OL' DOC BLANCHARD")
-            } else {
-                print("KINDA SLOW WITH YOUR COLT .45")
-            }
-        }
-        if T1 < 2 {
-            // run
-            M += 20
-            M1 -= 15
-            B -= 150
-            A -= 40
-        } else if T1 == 2 {
-            // attack
-            let B1 = shoot()
-            B -= B1 * 40 + 50
-            shootRiders(B1: B1)
-        } else if T1 == 3 {
-            // continue
-            if RND() <= 0.8 {
-                B -= 150
-                M1 -= 15
-            } else {
-                // 3450
-                print("THEY DID NOT ATTACK")
-            }
-        } else {
-            // circle wagons
-            let B1 = shoot()
-            B -= B1 * 30 + 50
-            M -= 25
-            shootRiders(B1: B1)
-        }
-        print("RIDERS WERE HOSTILE-- CHECK FOR LOSSES")
-        if B < 0 {
-            print("YOU RAN OUT OF BULLETS AND GOT MASSACRED BY THE RIDERS")
-            die()
-        }
-    } else {
-        // not hostile
-        if T1 < 2 {
-            // run
-            M += 15
-            A -= 10
-        } else if T1 == 2 {
-            // attack
-            M -= 5
-            B -= 100
-        } else if T1 == 4 {
-            // circle wagons
-            M -= 20
-        }
-        print("RIDERS WERE FRIENDLY, BUT CHECK FOR POSSIBLE LOSSES")
-    }
-} // end of riders attack
-
-func illness() {
-    // 6290 REM ***ILLNESS SUB-ROUTINE***
-    // 6300
-    var percent = 10 + 35.0 * Double(E - 1)
-    if 100 * RND() < percent {
-        print("MILD ILLNESS---MEDICINE USED")
-        M -= 5
-        M1 -= 2
-    } else {
-        percent = 100.0 - (40.0 / pow(4.0, Double(E) - 1.0))
-        if 100 * RND() < percent {
-            print("BAD ILLNESS---MEDICINE USED")
-            M -= 5
-            M1 -= 5
-        } else {
-            print("SERIOUS ILLNESS---")
-            print("YOU MUST STOP FOR MEDICAL ATTENTION")
-            M1 -= 10
-            S4 = 1
-        }
-    }
-    // 6440
     if M1 < 0 {
-        dieOfLackOfMedicalSupplies()
-    } else if L1 == 1 {
-        // blizzard
+        M1 = 0
+    }
+    if F < 13 {
+        print("YOU'D BETTER DO SOME HUNTING OR BUY FOOD AND SOON!!!!")
+    }
+    F = int(value: F)
+    B = int(value: B)
+    C = int(value: C)
+    M1 = int(value: M1)
+    T = int(value: T)
+    M = int(value: M)
+    
+    // M2 • TOTAL MILEAGE UP THROUGH PREVIOUS TURN
+    let M2 = M
+    
+    // sick or injured?
+    if S4 == 1 || K8 == 1 {
+        T -= 20
+        if T < 0 {
+            // 5080
+            T = 0
+            print("YOU CAN'T AFFORD A DOCTOR")
+            dieOfLackOfMedicalSupplies()
+        }
+        print("DOCTOR'S BILL IS $20")
+        K8 = 0
+        S4 = 0
+    }
+    // 1990
+    if M9 == 1 {
+        print("TOTAL MILEAGE IS 950")
+        M9 = 0
+    } else {
+        print("TOTAL MILEAGE IS \(M)")
+    }
+    print("FOOD\tBULLETS\tCLOTHING\tMISC. SUPP.\tCASH")
+    print("\(F)\t\t\(B)\t\(C)\t\t\t\(M1)\t\t\t\(T)")
+    var X: Int
+    if X1 != -1 {
+        X1 *= -1
+        print("DO YOU WANT TO (1) STOP AT THE NEXT FORT, (2) HUNT,")
+        print("OR (3) CONTINUE");
+        X = readInt()
+        if X < 1 || X > 3{
+            X = 3
+        }
+    } else {
+        print("DO YOU WANT TO (1) HUNT, OR (2) CONTINUE")
+        X = readInt()
+        if X != 1 {
+            X = 2
+        }
+        X += 1
+        if X == 2 && B < 40 {
+            print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
+            X = 3
+        }
+        X1 *= -1
+    }
+    // 2270 switch
+    if X == 1 {
+        // ***STOPPING AT FORT***
+        print("ENTER WHAT YOU WISH TO SPEND ON THE FOLLOWING")
+        func spend() -> Double {
+            var P = readDouble()
+            if P < 0 {
+                // keeping this interesting exploit
+                return P
+            }
+            T -= P
+            if T >= 0 {
+                return P
+            }
+            print("YOU DON'T HAVE THAT MUCH--KEEP YOUR SPENDING DOWN")
+            print("YOU MISS YOUR CHANCE TO SPEND ON THAT ITEM")
+            T += P
+            P = 0
+            return 0
+        }
+        print("FOOD")
+        F += 2 / 3 * spend()
+        print("AMMUNITION")
+        B = int(value: B + 2 / 3 * spend() * 50)
+        print("CLOTHING")
+        C += 2 / 3 * spend()
+        print("MISCELLANEOUS SUPPLIES")
+        M1 += 2 / 3 * spend()
+        M -= 45
+    } else if X == 2 {
+        // ***HUNTING***
+        if B < 40 {
+            print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
+            // Basic code is GOTO 2080, which could let you stop at fort, even if it is not a fort turn...
+            // TODO just don't show hunt option if B < 40
+            // for now, just continue...
+        } else {
+            M -= 45
+            // 2580 GOSUB 6140
+            var B1 = shoot()
+            if B1 > 1 {
+                if 100.0 * Double(rand.nextUniform()) < 13.0 * B1 {
+                    print("YOU MISSED---AND YOUR DINNER GOT AWAY.....")
+                } else {
+                    F += 48 - 2 * B1
+                    print("NICE SHOT--RIGHT ON TARGET--GOOD EATIN' TONIGHT!!")
+                    B -= 10 + 3 * B1
+                }
+            } else {
+                print("RIGHT BETWEEN THE EYES---YOU GOT A BIG ONE!!!!")
+                print("FULL BELLIES TONIGHT!")
+                F += 52 + RND() * 6
+                B -= 10 + RND() * 4
+            }
+        }
+    }
+    // 2720 continuing on
+    if F < 13 {
+        print("YOU RAN OUT OF FOOD AND STARVED TO DEATH")
+        die()
+    }
+    // ***EATING***
+    var E = 0
+    while true {
+        print("DO YOU WANT TO EAT (1) POORLY  (2) MODERATELY")
+        print("OR (3) WELL")
+        E = readInt()
+        if E < 1 || E > 3 {
+            continue
+        }
+        F -= Double(8 + 5 * E)
+        if F < 0 {
+            F += Double(8 + 5 * E)
+            print("YOU CAN'T EAT THAT WELL")
+            continue
+        }
+        break
+    }
+    M += 200 + (A - 220) / 5 + 10 * RND()
+    // FLAG FOR BLIZZARD
+    var L1 = 0
+    // FLAG FOR INSUFFICIENT CLOTHING IN COLD WEATHER
+    var C1 = 0
+    // ***RIDERS ATTACK***
+    let riderMileageSquare = pow(M / 100 - 4, 2)
+    if RND() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
+        print("RIDERS AHEAD.  THEY ")
+        var S5 = 0
+        if rand.nextBool() {
+            print("DON'T")
+            S5 = 1
+        }
+        print("LOOK HOSTILE")
+        print("TACTICS")
+        // T1 = CHOICE OF TACTICS WHEN ATTACKED
+        var T1 = 0
+        while T1 < 1 || T1 > 4 {
+            print("(1) RUN  (2) ATTACK  (3) CONTINUE  (4) CIRCLE WAGONS")
+            if RND() <= 0.2 {
+                S5 = 1 - S5
+            }
+            T1 = readInt()
+        }
+        if S5 != 1 {
+            func shootRiders(B1: Double) {
+                if B1 <= 1 {
+                    print("NICE SHOOTING---YOU DROVE THEM OFF")
+                } else if B1 > 5 {
+                    print("LOUSY SHOT---YOU GOT KNIFED")
+                    K8 =  1
+                    print("YOU HAVE TO SEE OL' DOC BLANCHARD")
+                } else {
+                    print("KINDA SLOW WITH YOUR COLT .45")
+                }
+            }
+            if T1 < 2 {
+                // run
+                M += 20
+                M1 -= 15
+                B -= 150
+                A -= 40
+            } else if T1 == 2 {
+                // attack
+                let B1 = shoot()
+                B -= B1 * 40 + 50
+                shootRiders(B1: B1)
+            } else if T1 == 3 {
+                // continue
+                if RND() <= 0.8 {
+                    B -= 150
+                    M1 -= 15
+                } else {
+                    // 3450
+                    print("THEY DID NOT ATTACK")
+                }
+            } else {
+                // circle wagons
+                let B1 = shoot()
+                B -= B1 * 30 + 50
+                M -= 25
+                shootRiders(B1: B1)
+            }
+            print("RIDERS WERE HOSTILE-- CHECK FOR LOSSES")
+            if B < 0 {
+                print("YOU RAN OUT OF BULLETS AND GOT MASSACRED BY THE RIDERS")
+                die()
+            }
+        } else {
+            // not hostile
+            if T1 < 2 {
+                // run
+                M += 15
+                A -= 10
+            } else if T1 == 2 {
+                // attack
+                M -= 5
+                B -= 100
+            } else if T1 == 4 {
+                // circle wagons
+                M -= 20
+            }
+            print("RIDERS WERE FRIENDLY, BUT CHECK FOR POSSIBLE LOSSES")
+        }
+    } // end of riders attack
+    
+    func illness() {
+        // 6290 REM ***ILLNESS SUB-ROUTINE***
+        // 6300
+        var percent = 10 + 35.0 * Double(E - 1)
+        if 100 * RND() < percent {
+            print("MILD ILLNESS---MEDICINE USED")
+            M -= 5
+            M1 -= 2
+        } else {
+            percent = 100.0 - (40.0 / pow(4.0, Double(E) - 1.0))
+            if 100 * RND() < percent {
+                print("BAD ILLNESS---MEDICINE USED")
+                M -= 5
+                M1 -= 5
+            } else {
+                print("SERIOUS ILLNESS---")
+                print("YOU MUST STOP FOR MEDICAL ATTENTION")
+                M1 -= 10
+                S4 = 1
+            }
+        }
+        // 6440
+        // M1: amount spent on misc supplies
+        if M1 < 0 {
+            dieOfLackOfMedicalSupplies()
+        }
+    }
+    
+    // 3540 ***SELECTION OF EVENTS***
+    // D1 = COUNTER IN GENERATING EVENTS
+    var D1 = 0
+    // 3560 RESTORE
+    var dataPointer = 0
+    var R1 = 100 * RND()
+    
+    while true {
+        D1 += 1
+        if D1 == 16 {
+            break;
+        }
+        let DATA = [6,11,13,15,17,22,32,35,37,42,44,54,64,69,95]
+        var D = Double(DATA[dataPointer])
+        // IF R1>D THEN 3580
+        if R1 > D {
+            continue;
+        }
+        switch (D1)
+        {
+        case 1:
+            // 3660
+            print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT")
+            M -= 15 + 5 * RND()
+            M1 -= 8
+            break
+        case 2:
+            // 3700
+            print("OX INJURES LEG--SLOWS YOU DOWN REST OF TRIP")
+            M -= 25
+            A -= 20
+            break
+        case 3:
+            // 3740
+            print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM")
+            print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING")
+            M -= 5 + 4 * RND()
+            M1 -= 2 + 3 * RND()
+            break
+        case 4:
+            // 3790
+            print("OX WANDERS OFF---SPEND TIME LOOKING FOR IT")
+            M -= 17
+            break
+        case 5:
+            // 3820
+            print("YOUR SON GETS LOST---SPEND HALF THE DAY LOOKING FOR HIM")
+            M -= 10
+            break
+        case 6:
+            // 3850
+            print("UNSAFE WATER--LOSE TIME LOOKING FOR CLEAN SPRING")
+            M -= 10 * RND() + 2
+            break
+        case 7:
+            // 3880
+            if M <= 950 {
+                print("HEAVY RAINS---TIME AND SUPPLIES LOST")
+                F -= 10
+                B -= 500
+                M1 -= 15
+                M -= 10 * RND() + 5
+            } else {
+                // 4490
+                print("COLD WEATHER---BRRRRRRR!---YOU")
+                if C <= 22 + 4 * RND() {
+                    print("DON'T")
+                    C1 = 1
+                } // lse 4530
+                print("HAVE ENOUGH CLOTHING TO KEEP YOU WARM")
+                if C1 != 0 {
+                    illness()
+                }
+            }
+            break
+        case 8:
+            // 3960
+            print("BANDITS ATTACK")
+            var B1 = shoot()
+            B -= 20 * B1
+            if B >= 0 && B1 <= 1 {
+                // 4100
+                print("QUICKEST DRAW OUTSIDE OF DODGE CITY!!!")
+                print("YOU GOT 'EM!")
+            } else {
+                if B < 0 {
+                    // 4000
+                    print("YOU RAN OUT OF BULLETS---THEY GET LOTS OF CASH")
+                    // 4010
+                    T /= 3
+                }
+                print("YOU GOT SHOT IN THE LEG AND THEY TOOK ONE OF YOUR OXEN")
+                K8 = 1
+                print("BETTER HAVE A  DOC LOOK AT YOUR WOUND")
+                M1 -= 5
+                A -= 20
+            }
+            break
+        case 9:
+            // 4130
+            print("THERE WAS A FIRE IN YOUR WAGON—FOOD AND SUPPLIES DAMAGE!")
+            F -= 40
+            B -= 400
+            M1 -= RND() * 8 + 3
+            M -= 15
+            break
+        case 10:
+            // 4190
+            print("LOSE YOUR WAY IN HEAVY FOG---TIME IS LOST")
+            M -= 10 + 5 * RND()
+            break
+        case 11:
+            // 4220
+            print("YOU KILLED A POISONOUS SNAKE AFTER IT BIT YOU")
+            B -= 10
+            M1 -= 5
+            if M1 < 0 {
+                print("YOU DIE OF SNAKEBITE SINCE YOU HAVE NO MEDICINE")
+                die()
+            }
+            break
+        case 12:
+            // 4290
+            print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES")
+            F -= 30
+            C -= 20
+            M -= 20 + 20 * RND()
+            break
+        case 13:
+            // 4340
+            print("WILD ANIMALS ATTACK!")
+            var B1 = shoot()
+            if B < 40 {
+                print("YOU WERE TOO LOW ON BULLETS")
+                print("THE WOLVES OVERPOWERED YOU")
+                K8 = 1
+                dieOfInjuresOrPneumonia()
+            }
+            if B1 <= 2 {
+                print("NICE SHOOTIN' PARDNER---THEY DIDN'T GET MUCH")
+            } else {
+                print("SLOW ON THE DRAW---THEY GOT AT YOUR FOOD AND CLOTHES")
+            }
+            B -= 20 * B1
+            C -= B * 4
+            F -= B1 * 8
+            break
+        case 14:
+            // 4560
+            print("HAIL STORM---SUPPLIES DAMAGED")
+            M -= 5 + RND() * 10
+            B -= 200
+            M1 -= 4 + RND() * 3
+            break
+        case 15:
+            // 4610
+            if E == 1 {
+                illness()
+            } else if E != 3 {
+                if RND() > 0.25 {
+                    illness()
+                }
+            } else if RND() < 0.5 {
+                illness()
+            }
+            break
+        case 16:
+            // 4670
+            print("HELPFUL INDIANS SHOW YOU WHERE TO FIND MORE FOOD")
+            F += 14
+            break
+        default:
+            print("unexpected event: \(D1)")
+            break
+        }
+    } // end while true
+    
+    func blizzardInMountainPass() {
+        // 4970
+        print("BLIZZARD IN MOUNTAIN PASS--TIME AND SUPPLIES LOST")
+        // L1: flag for blizzard
+        L1 = 1
+        F -= 25
+        M1 -= 10
+        B -= 300
+        M -= 30 + 40 * RND()
+        // 5030
+        if C < 18 + 2 * RND() {
+            illness()
+        }
+    }
+    
+    func checkForClearingPasses() {
+        // 4900
+        if M >= 1700 && F2 != 1 {
+            // 4920
+            // Flag for clearing Blue Mountains
+            F2 = 1
+            // 4930
+            if RND() < 0.7 {
+                // 4970
+                blizzardInMountainPass()
+            }
+        }
         // 4940
         if M <= 950 {
-            // flag for clearing south pass in setting mileage
+            // M9 • FLAG FOR CLEARING SOUTH PASS IN SETTING MILEAGE
             M9 = 1
         }
-        // GOTO 1230
     }
-    // GOTO 4710
-}
-
-// 3540 ***SELECTION OF EVENTS***
-// D1 = COUNTER IN GENERATING EVENTS
-var D1 = 0
-// 3560 RESTORE
-var dataPointer = 0
-var R1 = 100 * RND()
-
-while (true) {
-    D1 += 1
-    if D1 == 16 {
-        break;
-    }
-    let DATA = [6,11,13,15,17,22,32,35,37,42,44,54,64,69,95]
-    var D = Double(DATA[dataPointer])
-    // IF R1>D THEN 3580
-    if R1 > D {
-        continue;
-    }
-    switch (D1)
-    {
-    case 1:
-        // 3660
-        print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT")
-        M -= 15 + 5 * RND()
-        M1 -= 8
-        // GOTO 4710
-    case 2:
-        // 3700
-        print("OX INJURES LEG--SLOWS YOU DOWN REST OF TRIP")
-        M -= 25
-        A -= 20
-        // GOTO 4710
-    case 3:
-        // 3740
-        print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM")
-        print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING")
-        M -= 5 + 4 * RND()
-        M1 -= 2 + 3 * RND()
-        // GOTO 4710
-    case 4:
-        // 3790
-        print("OX WANDERS OFF---SPEND TIME LOOKING FOR IT")
-        M -= 17
-        // GOTO 4710
-    case 5:
-        // 3820
-        print("YOUR SON GETS LOST---SPEND HALF THE DAY LOOKING FOR HIM")
-        M -= 10
-        // GOTO 4710
-    case 6:
-        // 3850
-        print("UNSAFE WATER--LOSE TIME LOOKING FOR CLEAN SPRING")
-        M -= 10 * RND() + 2
-        // 4710
-    case 7:
-        // 3880
-        if M <= 950 {
-            print("HEAVY RAINS---TIME AND SUPPLIES LOST")
-            F -= 10
-            B -= 500
-            M1 -= 15
-            M -= 10 * RND() + 5
-        } else {
-            // 4490
-            print("COLD WEATHER---BRRRRRRR!---YOU")
-            if C <= 22 + 4 * RND() {
-                print("DON'T")
-                C1 = 1
-            } // lse 4530
-            print("HAVE ENOUGH CLOTHING TO KEEP YOU WARM")
-            if C1 != 0 {
-                illness()
-            }
-        }
-        // GOTO 4710
-    case 8:
-        // 3960
-        print("BANDITS ATTACK")
-        var B1 = shoot()
-        B -= 20 * B1
-        if B >= 0 && B1 <= 1 {
-            // 4100
-            print("QUICKEST DRAW OUTSIDE OF DODGE CITY!!!")
-            print("YOU GOT 'EM!")
-        } else {
-            if B < 0 {
-                // 4000
-                print("YOU RAN OUT OF BULLETS---THEY GET LOTS OF CASH")
-                // 4010
-                T /= 3
-            }
-            print("YOU GOT SHOT IN THE LEG AND THEY TOOK ONE OF YOUR OXEN")
-            K8 = 1
-            print("BETTER HAVE A  DOC LOOK AT YOUR WOUND")
-            M1 -= 5
-            A -= 20
-        }
-        // GOTO 4710
-    case 9:
-        // 4130
-        print("THERE WAS A FIRE IN YOUR WAGON—FOOD AND SUPPLIES DAMAGE!")
-        F -= 40
-        B -= 400
-        M1 -= RND() * 8 + 3
-        M -= 15
-        // GOTO 4710
-    case 10:
-        // 4190
-        print("LOSE YOUR WAY IN HEAVY FOG---TIME IS LOST")
-        M -= 10 + 5 * RND()
-        // GOTO 4710
-    case 11:
-        // 4220
-        print("YOU KILLED A POISONOUS SNAKE AFTER IT BIT YOU")
-        B -= 10
-        M1 -= 5
-        if M1 < 0 {
-            print("YOU DIE OF SNAKEBITE SINCE YOU HAVE NO MEDICINE")
-            die()
-        }
-        // gOTO 4710
-    case 12:
-        // 4290
-        print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES")
-        F -= 30
-        C -= 20
-        M -= 20 + 20 * RND()
-        // GOTO 4710
-    case 13:
-        // 4340
-        print("WILD ANIMALS ATTACK!")
-        var B1 = shoot()
-        if B < 40 {
-            print("YOU WERE TOO LOW ON BULLETS")
-            print("THE WOLVES OVERPOWERED YOU")
-            K8 = 1
-            dieOfInjuresOrPneumonia()
-        }
-        if B1 <= 2 {
-            print("NICE SHOOTIN' PARDNER---THEY DIDN'T GET MUCH")
-        } else {
-            print("SLOW ON THE DRAW---THEY GOT AT YOUR FOOD AND CLOTHES")
-        }
-        B -= 20 * B1
-        C -= B * 4
-        F -= B1 * 8
-        // GOTO 47100
-    case 14:
-        // 4560
-        print("HAIL STORM---SUPPLIES DAMAGED")
-        M -= 5 + RND() * 10
-        B -= 200
-        M1 -= 4 + RND() * 3
-        // GOTO 4710
-    case 15:
-        // 4610
-        if E == 1 {
-            illness()
-        } else if E != 3 {
-            if RND() > 0.25 {
-                illness()
-            }
-        } else if RND() < 0.5 {
-            illness()
-        }
-        // GOTO 4710
-    case 16:
-        // 4670
-        print("HELPFUL INDIANS SHOW YOU WHERE TO FIND MORE FOOD")
-        F += 14
-        // GOTO 4710
-    default:
-        continue
-    }
-}
-// 4700 ***MOUNTAINS***
-// 4710
-if M > 950 {
-    var square = pow(M / 100 - 15, 2.0)
-    if RND() * 10 <= 9 - (square + 72)/(square + 12) {
-        print("RUGGED MOUNTAINS")
-        if RND() <= 0.1 {
-            print("YOU GOT LOST---LOSE VALUABLE TIME TRYING TO FIND TRAIL!")
-            M -= 60
-            // GOTO 4860
-        } else {
-            // 4780
-            if RND() <= 0.11 {
-                print("WAGON DAMAGED!---LOSE TIME AND SUPPLIES")
-                M1 -= 5
-                B -= 200
-                M -= 20 + 30 * RND()
-                // GOTO 4860
+    
+    func clearSouthPass() {
+        // 4860
+        // F1: flag for clearing South Pass
+        if F1 != 1 {
+            F1 = 1
+            // 4880
+            if RND() < 0.8 {
+                blizzardInMountainPass()
             } else {
-                // 4840
-                print("THE GOING GETS SLOW")
-                M -= 45 + RND() / 0.02
-                if F1 != 1 {
-                    F1 = 1
-                    // 4880 TODO
-                } // else 4900
+                // 4890
+                print("YOU MADE IT SAFELY THROUGH SOUTH PASS--NO SNOW")
             }
         }
-        
-    } // else 4860
+        // 4900
+        return checkForClearingPasses()
+    }
+    
+    // 4700 ***MOUNTAINS***
+    // 4710
+    if M > 950 {
+        // 4720
+        var square = pow(M / 100 - 15, 2.0)
+        // At M==950, RND()*10 must be <= 6.58 for rugged mountains
+        // At M==1200, rhs==5.14
+        // At M==1500, square is 0, rhs==3
+        // At M==1800, rhs==5.14
+        // Distribution is V shaped trough with minimum at M==1500 and maximum of 8 for large M.
+        // See "Occurrence of 'Rugged Mountains' as a function of mileage" in the paper.
+        if RND() * 10 <= 9 - (square + 72)/(square + 12) {
+            print("RUGGED MOUNTAINS")
+            if RND() <= 0.1 {
+                // 4750
+                print("YOU GOT LOST---LOSE VALUABLE TIME TRYING TO FIND TRAIL!")
+                M -= 60
+            } else {
+                // 4780
+                if RND() <= 0.11 {
+                    print("WAGON DAMAGED!---LOSE TIME AND SUPPLIES")
+                    M1 -= 5
+                    B -= 200
+                    M -= 20 + 30 * RND()
+                } else {
+                    // 4840
+                    print("THE GOING GETS SLOW")
+                    // 4850
+                    M -= 45 + RND() / 0.02
+                }
+            }
+            
+        }
+        // 4860
+        clearSouthPass()
+    }
+    // 1230
+    if M >= 2040 {
+        // 5420 ***FINAL TURN***
+        // 5430
+        // F9: fraction of two weeks traveled on final turn
+        var F9 = (2040 - M2) / (M - M2)
+        let inverse = 1 - F9
+        F += inverse * (8.0 + 5.0 * Double(E))
+        print()
+        // 5470
+        print("YOU FINALLY ARRIVED AT OREGON CITY")
+        print("AFTER 2040 LONG MILES---HOORAY!!!!!")
+        print("A REAL PIONEER!")
+        print()
+        // 5510
+        F9 = int(value:F9 * 14)
+        D3 = D3 * 14 + Int(F9)
+        F9 += 1
+        if F9 >= 8 {
+            F9 -= 7
+        }
+        let daysOfWeek = [
+            "MONDAY",
+            "TUESDAY",
+            "WEDNESDAY",
+            "THURSDAY",
+            "FRIDAY",
+            "SATURDAY",
+            "SUNDAY",
+        ]
+        print("\(daysOfWeek[Int(F9)]) ")
+        // 5700
+    }
+    // 1240 ***SETTING DATE***
 }
-// IF M <= 950 THEN 1230
