@@ -4,7 +4,7 @@
 //
 //  Created by kaon on 5/17/17.
 //
-// Port of Creative Computing May-June 1978 Vol 4 No 3 "Oregon Trail" pp 132 - 139
+// Port of Creative Computing May-June 1978 Vol 4 No 3 pp 132 - 139 "Oregon Trail" by Dan Rawitsch
 //
 
 import Foundation
@@ -45,7 +45,7 @@ func die() {
     print("WOULD YOU LIKE US TO INFORM YOUR NEXT OF KIN?")
     C$ = readLine()
     if C$ != "YES" {
-        print("BUT YOUR AUNT SADIE IN ST. L6U1S IS REALLY WORRIED ABOUT YOU")
+        print("BUT YOUR AUNT SADIE IN ST. LOUIS IS REALLY WORRIED ABOUT YOU")
     } else {
         print("THAT WILL BE $4.50 FOR THE TELEGRAPH CHARGE.")    
     }
@@ -59,6 +59,22 @@ func die() {
     print()
     print("                 THE OREGON CITY CHAMBER OF COMMERCE")
     exit(0)
+}
+
+// Flag for injury
+// TODO parameter?
+var K8 = 0
+func dieOfInjuresOrPneumonia() {
+    // 5120
+    print("YOU DIED OF ")
+    print(K8 == 1 ? "INJURIES" : "PNEUMONIA")
+    die()
+}
+
+func dieOfLackOfMedicalSupplies() {
+    // 5110
+    print("YOU RAN OUT OF MEDICAL SUPPLIES")
+    dieOfInjuresOrPneumonia()
 }
 
 let rand = GKARC4RandomSource()
@@ -144,8 +160,6 @@ func shoot() -> Double {
 
 // Flag for Fort Option
 var X1 = -1
-// Flag for injury
-var K8 = 0
 // Flag for illness
 var S4 = 0
 // Flag for clearing South Pass
@@ -251,10 +265,7 @@ if S4 == 1 || K8 == 1 {
         // 5080
         T = 0
         print("YOU CAN'T AFFORD A DOCTOR")
-        print("YOU RAN OUT OF MEDICAL SUPPLIES")
-        print("YOU DIED OF ")
-        print(K8 == 1 ? "INJURIES" : "PNEUMONIA")
-        die()
+        dieOfLackOfMedicalSupplies()
     }
     print("DOCTOR'S BILL IS $20")
     K8 = 0
@@ -353,10 +364,11 @@ if F < 13 {
     die()
 }
 // ***EATING***
+var E = 0
 while true {
     print("DO YOU WANT TO EAT (1) POORLY  (2) MODERATELY")
     print("OR (3) WELL")
-    var E = readInt()
+    E = readInt()
     if E < 1 || E > 3 {
         continue
     }
@@ -384,6 +396,7 @@ if RND() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
     }
     print("LOOK HOSTILE")
     print("TACTICS")
+    // T1 = CHOICE OF TACTICS WHEN ATTACKED
     var T1 = 0
     while T1 < 1 || T1 > 4 {
         print("(1) RUN  (2) ATTACK  (3) CONTINUE  (4) CIRCLE WAGONS")
@@ -401,19 +414,22 @@ if RND() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
                 K8 =  1
                 print("YOU HAVE TO SEE OL' DOC BLANCHARD")
             } else {
-                print("KINDA SLOW WITH YORU COLT .45")
+                print("KINDA SLOW WITH YOUR COLT .45")
             }
         }
         if T1 < 2 {
+            // run
             M += 20
             M1 -= 15
             B -= 150
             A -= 40
         } else if T1 == 2 {
+            // attack
             let B1 = shoot()
-            B -= B1 * 40 - 50
+            B -= B1 * 40 + 50
             shootRiders(B1: B1)
         } else if T1 == 3 {
+            // continue
             if RND() <= 0.8 {
                 B -= 150
                 M1 -= 15
@@ -422,9 +438,9 @@ if RND() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
                 print("THEY DID NOT ATTACK")
             }
         } else {
-            // T1 == 4
+            // circle wagons
             let B1 = shoot()
-            B -= B1 * 30 - 50
+            B -= B1 * 30 + 50
             M -= 25
             shootRiders(B1: B1)
         }
@@ -436,16 +452,261 @@ if RND() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
     } else {
         // not hostile
         if T1 < 2 {
+            // run
             M += 15
             A -= 10
         } else if T1 == 2 {
+            // attack
             M -= 5
             B -= 100
         } else if T1 == 4 {
+            // circle wagons
             M -= 20
         }
         print("RIDERS WERE FRIENDLY, BUT CHECK FOR POSSIBLE LOSSES")
     }
 } // end of riders attack
 
+func illness() {
+    // 6290 REM ***ILLNESS SUB-ROUTINE***
+    // 6300
+    var percent = 10 + 35.0 * Double(E - 1)
+    if 100 * RND() < percent {
+        print("MILD ILLNESS---MEDICINE USED")
+        M -= 5
+        M1 -= 2
+    } else {
+        percent = 100.0 - (40.0 / pow(4.0, Double(E) - 1.0))
+        if 100 * RND() < percent {
+            print("BAD ILLNESS---MEDICINE USED")
+            M -= 5
+            M1 -= 5
+        } else {
+            print("SERIOUS ILLNESS---")
+            print("YOU MUST STOP FOR MEDICAL ATTENTION")
+            M1 -= 10
+            S4 = 1
+        }
+    }
+    // 6440
+    if M1 < 0 {
+        dieOfLackOfMedicalSupplies()
+    } else if L1 == 1 {
+        // blizzard
+        // 4940
+        if M <= 950 {
+            // flag for clearing south pass in setting mileage
+            M9 = 1
+        }
+        // GOTO 1230
+    }
+    // GOTO 4710
+}
+
 // 3540 ***SELECTION OF EVENTS***
+// D1 = COUNTER IN GENERATING EVENTS
+var D1 = 0
+// 3560 RESTORE
+var dataPointer = 0
+var R1 = 100 * RND()
+
+while (true) {
+    D1 += 1
+    if D1 == 16 {
+        break;
+    }
+    let DATA = [6,11,13,15,17,22,32,35,37,42,44,54,64,69,95]
+    var D = Double(DATA[dataPointer])
+    // IF R1>D THEN 3580
+    if R1 > D {
+        continue;
+    }
+    switch (D1)
+    {
+    case 1:
+        // 3660
+        print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT")
+        M -= 15 + 5 * RND()
+        M1 -= 8
+        // GOTO 4710
+    case 2:
+        // 3700
+        print("OX INJURES LEG--SLOWS YOU DOWN REST OF TRIP")
+        M -= 25
+        A -= 20
+        // GOTO 4710
+    case 3:
+        // 3740
+        print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM")
+        print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING")
+        M -= 5 + 4 * RND()
+        M1 -= 2 + 3 * RND()
+        // GOTO 4710
+    case 4:
+        // 3790
+        print("OX WANDERS OFF---SPEND TIME LOOKING FOR IT")
+        M -= 17
+        // GOTO 4710
+    case 5:
+        // 3820
+        print("YOUR SON GETS LOST---SPEND HALF THE DAY LOOKING FOR HIM")
+        M -= 10
+        // GOTO 4710
+    case 6:
+        // 3850
+        print("UNSAFE WATER--LOSE TIME LOOKING FOR CLEAN SPRING")
+        M -= 10 * RND() + 2
+        // 4710
+    case 7:
+        // 3880
+        if M <= 950 {
+            print("HEAVY RAINS---TIME AND SUPPLIES LOST")
+            F -= 10
+            B -= 500
+            M1 -= 15
+            M -= 10 * RND() + 5
+        } else {
+            // 4490
+            print("COLD WEATHER---BRRRRRRR!---YOU")
+            if C <= 22 + 4 * RND() {
+                print("DON'T")
+                C1 = 1
+            } // lse 4530
+            print("HAVE ENOUGH CLOTHING TO KEEP YOU WARM")
+            if C1 != 0 {
+                illness()
+            }
+        }
+        // GOTO 4710
+    case 8:
+        // 3960
+        print("BANDITS ATTACK")
+        var B1 = shoot()
+        B -= 20 * B1
+        if B >= 0 && B1 <= 1 {
+            // 4100
+            print("QUICKEST DRAW OUTSIDE OF DODGE CITY!!!")
+            print("YOU GOT 'EM!")
+        } else {
+            if B < 0 {
+                // 4000
+                print("YOU RAN OUT OF BULLETS---THEY GET LOTS OF CASH")
+                // 4010
+                T /= 3
+            }
+            print("YOU GOT SHOT IN THE LEG AND THEY TOOK ONE OF YOUR OXEN")
+            K8 = 1
+            print("BETTER HAVE A  DOC LOOK AT YOUR WOUND")
+            M1 -= 5
+            A -= 20
+        }
+        // GOTO 4710
+    case 9:
+        // 4130
+        print("THERE WAS A FIRE IN YOUR WAGON—FOOD AND SUPPLIES DAMAGE!")
+        F -= 40
+        B -= 400
+        M1 -= RND() * 8 + 3
+        M -= 15
+        // GOTO 4710
+    case 10:
+        // 4190
+        print("LOSE YOUR WAY IN HEAVY FOG---TIME IS LOST")
+        M -= 10 + 5 * RND()
+        // GOTO 4710
+    case 11:
+        // 4220
+        print("YOU KILLED A POISONOUS SNAKE AFTER IT BIT YOU")
+        B -= 10
+        M1 -= 5
+        if M1 < 0 {
+            print("YOU DIE OF SNAKEBITE SINCE YOU HAVE NO MEDICINE")
+            die()
+        }
+        // gOTO 4710
+    case 12:
+        // 4290
+        print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES")
+        F -= 30
+        C -= 20
+        M -= 20 + 20 * RND()
+        // GOTO 4710
+    case 13:
+        // 4340
+        print("WILD ANIMALS ATTACK!")
+        var B1 = shoot()
+        if B < 40 {
+            print("YOU WERE TOO LOW ON BULLETS")
+            print("THE WOLVES OVERPOWERED YOU")
+            K8 = 1
+            dieOfInjuresOrPneumonia()
+        }
+        if B1 <= 2 {
+            print("NICE SHOOTIN' PARDNER---THEY DIDN'T GET MUCH")
+        } else {
+            print("SLOW ON THE DRAW---THEY GOT AT YOUR FOOD AND CLOTHES")
+        }
+        B -= 20 * B1
+        C -= B * 4
+        F -= B1 * 8
+        // GOTO 47100
+    case 14:
+        // 4560
+        print("HAIL STORM---SUPPLIES DAMAGED")
+        M -= 5 + RND() * 10
+        B -= 200
+        M1 -= 4 + RND() * 3
+        // GOTO 4710
+    case 15:
+        // 4610
+        if E == 1 {
+            illness()
+        } else if E != 3 {
+            if RND() > 0.25 {
+                illness()
+            }
+        } else if RND() < 0.5 {
+            illness()
+        }
+        // GOTO 4710
+    case 16:
+        // 4670
+        print("HELPFUL INDIANS SHOW YOU WHERE TO FIND MORE FOOD")
+        F += 14
+        // GOTO 4710
+    default:
+        continue
+    }
+}
+// 4700 ***MOUNTAINS***
+// 4710
+if M > 950 {
+    var square = pow(M / 100 - 15, 2.0)
+    if RND() * 10 <= 9 - (square + 72)/(square + 12) {
+        print("RUGGED MOUNTAINS")
+        if RND() <= 0.1 {
+            print("YOU GOT LOST---LOSE VALUABLE TIME TRYING TO FIND TRAIL!")
+            M -= 60
+            // GOTO 4860
+        } else {
+            // 4780
+            if RND() <= 0.11 {
+                print("WAGON DAMAGED!---LOSE TIME AND SUPPLIES")
+                M1 -= 5
+                B -= 200
+                M -= 20 + 30 * RND()
+                // GOTO 4860
+            } else {
+                // 4840
+                print("THE GOING GETS SLOW")
+                M -= 45 + RND() / 0.02
+                if F1 != 1 {
+                    F1 = 1
+                    // 4880 TODO
+                } // else 4900
+            }
+        }
+        
+    } // else 4860
+}
+// IF M <= 950 THEN 1230
