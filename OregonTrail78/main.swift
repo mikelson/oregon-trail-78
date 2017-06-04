@@ -62,24 +62,21 @@ func die() {
     exit(0)
 }
 
-// Flag for injury
-// TODO parameter?
-var K8 = 0
-func dieOfInjuresOrPneumonia() {
+func dieOfInjuriesOrPneumonia(injuries: Bool) {
     // 5120
     print("YOU DIED OF ")
-    print(K8 == 1 ? "INJURIES" : "PNEUMONIA")
+    print(injuries ? "INJURIES" : "PNEUMONIA")
     die()
 }
 
-func dieOfLackOfMedicalSupplies() {
+func dieOfLackOfMedicalSupplies(injuries: Bool) {
     // 5110
     print("YOU RAN OUT OF MEDICAL SUPPLIES")
-    dieOfInjuresOrPneumonia()
+    dieOfInjuriesOrPneumonia(injuries: injuries)
 }
 
 let rand = GKARC4RandomSource()
-func RND() -> Double {
+func nextRandomFraction() -> Double {
     return Double(rand.nextUniform())
 }
 
@@ -174,6 +171,8 @@ func shoot() -> Double {
 }
 
 // INITIAL PURCHASE
+
+var isInjured = false
 
 // Flag for Fort Option
 var X1 = -1
@@ -281,16 +280,16 @@ while (true) {
     let M2 = M
     
     // sick or injured?
-    if S4 == 1 || K8 == 1 {
+    if S4 == 1 || isInjured {
         T -= 20
         if T < 0 {
             // 5080
             T = 0
             print("YOU CAN'T AFFORD A DOCTOR")
-            dieOfLackOfMedicalSupplies()
+            dieOfLackOfMedicalSupplies(injuries: isInjured)
         }
         print("DOCTOR'S BILL IS $20")
-        K8 = 0
+        isInjured = false
         S4 = 0
     }
     // 1990
@@ -378,8 +377,8 @@ while (true) {
             } else {
                 print("RIGHT BETWEEN THE EYES---YOU GOT A BIG ONE!!!!")
                 print("FULL BELLIES TONIGHT!")
-                F += 52 + RND() * 6
-                B -= 10 + RND() * 4
+                F += 52 + nextRandomFraction() * 6
+                B -= 10 + nextRandomFraction() * 4
             }
         }
     }
@@ -405,14 +404,14 @@ while (true) {
         }
         break
     }
-    M += 200 + (A - 220) / 5 + 10 * RND()
+    M += 200 + (A - 220) / 5 + 10 * nextRandomFraction()
     // FLAG FOR BLIZZARD
     var L1 = 0
     // FLAG FOR INSUFFICIENT CLOTHING IN COLD WEATHER
     var C1 = 0
     // ***RIDERS ATTACK***
     let riderMileageSquare = pow(M / 100 - 4, 2)
-    if RND() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
+    if nextRandomFraction() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
         print("RIDERS AHEAD.  THEY ")
         var S5 = 0
         if rand.nextBool() {
@@ -425,7 +424,7 @@ while (true) {
         var T1 = 0
         while T1 < 1 || T1 > 4 {
             print("(1) RUN  (2) ATTACK  (3) CONTINUE  (4) CIRCLE WAGONS")
-            if RND() <= 0.2 {
+            if nextRandomFraction() <= 0.2 {
                 S5 = 1 - S5
             }
             T1 = readInt()
@@ -436,7 +435,7 @@ while (true) {
                     print("NICE SHOOTING---YOU DROVE THEM OFF")
                 } else if B1 > 5 {
                     print("LOUSY SHOT---YOU GOT KNIFED")
-                    K8 =  1
+                    isInjured = true
                     print("YOU HAVE TO SEE OL' DOC BLANCHARD")
                 } else {
                     print("KINDA SLOW WITH YOUR COLT .45")
@@ -455,7 +454,7 @@ while (true) {
                 shootRiders(B1: B1)
             } else if T1 == 3 {
                 // continue
-                if RND() <= 0.8 {
+                if nextRandomFraction() <= 0.8 {
                     B -= 150
                     M1 -= 15
                 } else {
@@ -496,13 +495,13 @@ while (true) {
         // 6290 REM ***ILLNESS SUB-ROUTINE***
         // 6300
         var percent = 10 + 35.0 * Double(E - 1)
-        if 100 * RND() < percent {
+        if 100 * nextRandomFraction() < percent {
             print("MILD ILLNESS---MEDICINE USED")
             M -= 5
             M1 -= 2
         } else {
             percent = 100.0 - (40.0 / pow(4.0, Double(E) - 1.0))
-            if 100 * RND() < percent {
+            if 100 * nextRandomFraction() < percent {
                 print("BAD ILLNESS---MEDICINE USED")
                 M -= 5
                 M1 -= 5
@@ -516,7 +515,7 @@ while (true) {
         // 6440
         // M1: amount spent on misc supplies
         if M1 < 0 {
-            dieOfLackOfMedicalSupplies()
+            dieOfLackOfMedicalSupplies(injuries: isInjured)
         }
     }
     
@@ -525,7 +524,7 @@ while (true) {
     var D1 = 0
     // 3560 RESTORE
     var dataPointer = 0
-    var R1 = 100 * RND()
+    var R1 = 100 * nextRandomFraction()
     
     while true {
         D1 += 1
@@ -543,7 +542,7 @@ while (true) {
         case 1:
             // 3660
             print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT")
-            M -= 15 + 5 * RND()
+            M -= 15 + 5 * nextRandomFraction()
             M1 -= 8
             break
         case 2:
@@ -556,8 +555,8 @@ while (true) {
             // 3740
             print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM")
             print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING")
-            M -= 5 + 4 * RND()
-            M1 -= 2 + 3 * RND()
+            M -= 5 + 4 * nextRandomFraction()
+            M1 -= 2 + 3 * nextRandomFraction()
             break
         case 4:
             // 3790
@@ -572,7 +571,7 @@ while (true) {
         case 6:
             // 3850
             print("UNSAFE WATER--LOSE TIME LOOKING FOR CLEAN SPRING")
-            M -= 10 * RND() + 2
+            M -= 10 * nextRandomFraction() + 2
             break
         case 7:
             // 3880
@@ -581,11 +580,11 @@ while (true) {
                 F -= 10
                 B -= 500
                 M1 -= 15
-                M -= 10 * RND() + 5
+                M -= 10 * nextRandomFraction() + 5
             } else {
                 // 4490
                 print("COLD WEATHER---BRRRRRRR!---YOU")
-                if C <= 22 + 4 * RND() {
+                if C <= 22 + 4 * nextRandomFraction() {
                     print("DON'T")
                     C1 = 1
                 } // lse 4530
@@ -612,8 +611,8 @@ while (true) {
                     T /= 3
                 }
                 print("YOU GOT SHOT IN THE LEG AND THEY TOOK ONE OF YOUR OXEN")
-                K8 = 1
-                print("BETTER HAVE A  DOC LOOK AT YOUR WOUND")
+                isInjured = true
+                print("BETTER HAVE A DOC LOOK AT YOUR WOUND")
                 M1 -= 5
                 A -= 20
             }
@@ -623,13 +622,13 @@ while (true) {
             print("THERE WAS A FIRE IN YOUR WAGON—FOOD AND SUPPLIES DAMAGE!")
             F -= 40
             B -= 400
-            M1 -= RND() * 8 + 3
+            M1 -= nextRandomFraction() * 8 + 3
             M -= 15
             break
         case 10:
             // 4190
             print("LOSE YOUR WAY IN HEAVY FOG---TIME IS LOST")
-            M -= 10 + 5 * RND()
+            M -= 10 + 5 * nextRandomFraction()
             break
         case 11:
             // 4220
@@ -646,7 +645,7 @@ while (true) {
             print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES")
             F -= 30
             C -= 20
-            M -= 20 + 20 * RND()
+            M -= 20 + 20 * nextRandomFraction()
             break
         case 13:
             // 4340
@@ -655,8 +654,8 @@ while (true) {
             if B < 40 {
                 print("YOU WERE TOO LOW ON BULLETS")
                 print("THE WOLVES OVERPOWERED YOU")
-                K8 = 1
-                dieOfInjuresOrPneumonia()
+                isInjured = true
+                dieOfInjuriesOrPneumonia(injuries: true)
             }
             if B1 <= 2 {
                 print("NICE SHOOTIN' PARDNER---THEY DIDN'T GET MUCH")
@@ -670,19 +669,19 @@ while (true) {
         case 14:
             // 4560
             print("HAIL STORM---SUPPLIES DAMAGED")
-            M -= 5 + RND() * 10
+            M -= 5 + nextRandomFraction() * 10
             B -= 200
-            M1 -= 4 + RND() * 3
+            M1 -= 4 + nextRandomFraction() * 3
             break
         case 15:
             // 4610
             if E == 1 {
                 illness()
             } else if E != 3 {
-                if RND() > 0.25 {
+                if nextRandomFraction() > 0.25 {
                     illness()
                 }
-            } else if RND() < 0.5 {
+            } else if nextRandomFraction() < 0.5 {
                 illness()
             }
             break
@@ -705,9 +704,9 @@ while (true) {
         F -= 25
         M1 -= 10
         B -= 300
-        M -= 30 + 40 * RND()
+        M -= 30 + 40 * nextRandomFraction()
         // 5030
-        if C < 18 + 2 * RND() {
+        if C < 18 + 2 * nextRandomFraction() {
             illness()
         }
     }
@@ -719,7 +718,7 @@ while (true) {
             // Flag for clearing Blue Mountains
             F2 = 1
             // 4930
-            if RND() < 0.7 {
+            if nextRandomFraction() < 0.7 {
                 // 4970
                 blizzardInMountainPass()
             }
@@ -737,7 +736,7 @@ while (true) {
         if F1 != 1 {
             F1 = 1
             // 4880
-            if RND() < 0.8 {
+            if nextRandomFraction() < 0.8 {
                 blizzardInMountainPass()
             } else {
                 // 4890
@@ -753,30 +752,30 @@ while (true) {
     if M > 950 {
         // 4720
         var square = pow(M / 100 - 15, 2.0)
-        // At M==950, RND()*10 must be <= 6.58 for rugged mountains
+        // At M==950, nextRandomFraction()*10 must be <= 6.58 for rugged mountains
         // At M==1200, rhs==5.14
         // At M==1500, square is 0, rhs==3
         // At M==1800, rhs==5.14
         // Distribution is V shaped trough with minimum at M==1500 and maximum of 8 for large M.
         // See "Occurrence of 'Rugged Mountains' as a function of mileage" in the paper.
-        if RND() * 10 <= 9 - (square + 72)/(square + 12) {
+        if nextRandomFraction() * 10 <= 9 - (square + 72)/(square + 12) {
             print("RUGGED MOUNTAINS")
-            if RND() <= 0.1 {
+            if nextRandomFraction() <= 0.1 {
                 // 4750
                 print("YOU GOT LOST---LOSE VALUABLE TIME TRYING TO FIND TRAIL!")
                 M -= 60
             } else {
                 // 4780
-                if RND() <= 0.11 {
+                if nextRandomFraction() <= 0.11 {
                     print("WAGON DAMAGED!---LOSE TIME AND SUPPLIES")
                     M1 -= 5
                     B -= 200
-                    M -= 20 + 30 * RND()
+                    M -= 20 + 30 * nextRandomFraction()
                 } else {
                     // 4840
                     print("THE GOING GETS SLOW")
                     // 4850
-                    M -= 45 + RND() / 0.02
+                    M -= 45 + nextRandomFraction() / 0.02
                 }
             }
             
