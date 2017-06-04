@@ -517,181 +517,147 @@ while (true) {
     }
     
     // 3540 ***SELECTION OF EVENTS***
-    // D1 = COUNTER IN GENERATING EVENTS
-    var D1 = 0
-    // 3560 RESTORE
-    var dataPointer = 0
-    var R1 = 100 * nextRandomFraction()
-    
-    while true {
-        D1 += 1
-        if D1 == 16 {
-            break;
-        }
-        let DATA = [6,11,13,15,17,22,32,35,37,42,44,54,64,69,95]
-        var D = Double(DATA[dataPointer])
-        // IF R1>D THEN 3580
-        if R1 > D {
-            continue;
-        }
-        switch (D1)
-        {
-        case 1:
-            // 3660
-            print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT")
-            M -= 15 + 5 * nextRandomFraction()
-            M1 -= 8
-            break
-        case 2:
-            // 3700
-            print("OX INJURES LEG--SLOWS YOU DOWN REST OF TRIP")
-            M -= 25
-            A -= 20
-            break
-        case 3:
-            // 3740
-            print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM")
-            print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING")
-            M -= 5 + 4 * nextRandomFraction()
-            M1 -= 2 + 3 * nextRandomFraction()
-            break
-        case 4:
-            // 3790
-            print("OX WANDERS OFF---SPEND TIME LOOKING FOR IT")
-            M -= 17
-            break
-        case 5:
-            // 3820
-            print("YOUR SON GETS LOST---SPEND HALF THE DAY LOOKING FOR HIM")
-            M -= 10
-            break
-        case 6:
-            // 3850
-            print("UNSAFE WATER--LOSE TIME LOOKING FOR CLEAN SPRING")
-            M -= 10 * nextRandomFraction() + 2
-            break
-        case 7:
-            // 3880
-            if M <= 950 {
-                print("HEAVY RAINS---TIME AND SUPPLIES LOST")
-                F -= 10
-                B -= 500
-                M1 -= 15
-                M -= 10 * nextRandomFraction() + 5
-            } else {
-                // 4490
-                print("COLD WEATHER---BRRRRRRR!---YOU")
-                if C <= 22 + 4 * nextRandomFraction() {
-                    print("DON'T")
-                    C1 = 1
-                } // lse 4530
-                print("HAVE ENOUGH CLOTHING TO KEEP YOU WARM")
-                if C1 != 0 {
-                    illness()
-                }
+    let eventRoll = 100 * nextRandomFraction()
+    switch (eventRoll)
+    {
+    case 0..<6:
+        // 3660
+        print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT")
+        M -= 15 + 5 * nextRandomFraction()
+        M1 -= 8
+    case 6..<11:
+        // 3700
+        print("OX INJURES LEG--SLOWS YOU DOWN REST OF TRIP")
+        M -= 25
+        A -= 20
+    case 11..<13:
+        // 3740
+        print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM")
+        print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING")
+        M -= 5 + 4 * nextRandomFraction()
+        M1 -= 2 + 3 * nextRandomFraction()
+    case 13..<15:
+        // 3790
+        print("OX WANDERS OFF---SPEND TIME LOOKING FOR IT")
+        M -= 17
+    case 15..<17:
+        // 3820
+        print("YOUR SON GETS LOST---SPEND HALF THE DAY LOOKING FOR HIM")
+        M -= 10
+    case 17..<22:
+        // 3850
+        print("UNSAFE WATER--LOSE TIME LOOKING FOR CLEAN SPRING")
+        M -= 10 * nextRandomFraction() + 2
+    case 22..<32:
+        // 3880
+        if M <= 950 {
+            print("HEAVY RAINS---TIME AND SUPPLIES LOST")
+            F -= 10
+            B -= 500
+            M1 -= 15
+            M -= 10 * nextRandomFraction() + 5
+        } else {
+            // 4490
+            print("COLD WEATHER---BRRRRRRR!---YOU")
+            if C <= 22 + 4 * nextRandomFraction() {
+                print("DON'T")
+                C1 = 1
+            } // lse 4530
+            print("HAVE ENOUGH CLOTHING TO KEEP YOU WARM")
+            if C1 != 0 {
+                illness()
             }
-            break
-        case 8:
-            // 3960
-            print("BANDITS ATTACK")
-            var B1 = shoot()
-            B -= 20 * B1
-            if B >= 0 && B1 <= 1 {
-                // 4100
-                print("QUICKEST DRAW OUTSIDE OF DODGE CITY!!!")
-                print("YOU GOT 'EM!")
-            } else {
-                if B < 0 {
-                    // 4000
-                    print("YOU RAN OUT OF BULLETS---THEY GET LOTS OF CASH")
-                    // 4010
-                    T /= 3
-                }
-                print("YOU GOT SHOT IN THE LEG AND THEY TOOK ONE OF YOUR OXEN")
-                isInjured = true
-                print("BETTER HAVE A DOC LOOK AT YOUR WOUND")
-                M1 -= 5
-                A -= 20
+        }
+    case 32..<35:
+        // 3960
+        print("BANDITS ATTACK")
+        var B1 = shoot()
+        B -= 20 * B1
+        if B >= 0 && B1 <= 1 {
+            // 4100
+            print("QUICKEST DRAW OUTSIDE OF DODGE CITY!!!")
+            print("YOU GOT 'EM!")
+        } else {
+            if B < 0 {
+                // 4000
+                print("YOU RAN OUT OF BULLETS---THEY GET LOTS OF CASH")
+                // 4010
+                T /= 3
             }
-            break
-        case 9:
-            // 4130
-            print("THERE WAS A FIRE IN YOUR WAGON—FOOD AND SUPPLIES DAMAGE!")
-            F -= 40
-            B -= 400
-            M1 -= nextRandomFraction() * 8 + 3
-            M -= 15
-            break
-        case 10:
-            // 4190
-            print("LOSE YOUR WAY IN HEAVY FOG---TIME IS LOST")
-            M -= 10 + 5 * nextRandomFraction()
-            break
-        case 11:
-            // 4220
-            print("YOU KILLED A POISONOUS SNAKE AFTER IT BIT YOU")
-            B -= 10
+            print("YOU GOT SHOT IN THE LEG AND THEY TOOK ONE OF YOUR OXEN")
+            isInjured = true
+            print("BETTER HAVE A DOC LOOK AT YOUR WOUND")
             M1 -= 5
-            if M1 < 0 {
-                print("YOU DIE OF SNAKEBITE SINCE YOU HAVE NO MEDICINE")
-                die()
-            }
-            break
-        case 12:
-            // 4290
-            print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES")
-            F -= 30
-            C -= 20
-            M -= 20 + 20 * nextRandomFraction()
-            break
-        case 13:
-            // 4340
-            print("WILD ANIMALS ATTACK!")
-            var B1 = shoot()
-            if B < 40 {
-                print("YOU WERE TOO LOW ON BULLETS")
-                print("THE WOLVES OVERPOWERED YOU")
-                isInjured = true
-                dieOfInjuriesOrPneumonia(injuries: true)
-            }
-            if B1 <= 2 {
-                print("NICE SHOOTIN' PARDNER---THEY DIDN'T GET MUCH")
-            } else {
-                print("SLOW ON THE DRAW---THEY GOT AT YOUR FOOD AND CLOTHES")
-            }
-            B -= 20 * B1
-            C -= B * 4
-            F -= B1 * 8
-            break
-        case 14:
-            // 4560
-            print("HAIL STORM---SUPPLIES DAMAGED")
-            M -= 5 + nextRandomFraction() * 10
-            B -= 200
-            M1 -= 4 + nextRandomFraction() * 3
-            break
-        case 15:
-            // 4610
-            if E == 1 {
-                illness()
-            } else if E != 3 {
-                if nextRandomFraction() > 0.25 {
-                    illness()
-                }
-            } else if nextRandomFraction() < 0.5 {
-                illness()
-            }
-            break
-        case 16:
-            // 4670
-            print("HELPFUL INDIANS SHOW YOU WHERE TO FIND MORE FOOD")
-            F += 14
-            break
-        default:
-            print("unexpected event: \(D1)")
-            break
+            A -= 20
         }
-    } // end while true
+    case 35..<37:
+        // 4130
+        print("THERE WAS A FIRE IN YOUR WAGON—FOOD AND SUPPLIES DAMAGE!")
+        F -= 40
+        B -= 400
+        M1 -= nextRandomFraction() * 8 + 3
+        M -= 15
+    case 37..<42:
+        // 4190
+        print("LOSE YOUR WAY IN HEAVY FOG---TIME IS LOST")
+        M -= 10 + 5 * nextRandomFraction()
+    case 42..<44:
+        // 4220
+        print("YOU KILLED A POISONOUS SNAKE AFTER IT BIT YOU")
+        B -= 10
+        M1 -= 5
+        if M1 < 0 {
+            print("YOU DIE OF SNAKEBITE SINCE YOU HAVE NO MEDICINE")
+            die()
+        }
+    case 44..<54:
+        // 4290
+        print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES")
+        F -= 30
+        C -= 20
+        M -= 20 + 20 * nextRandomFraction()
+    case 54..<64:
+        // 4340
+        print("WILD ANIMALS ATTACK!")
+        var B1 = shoot()
+        if B < 40 {
+            print("YOU WERE TOO LOW ON BULLETS")
+            print("THE WOLVES OVERPOWERED YOU")
+            isInjured = true
+            dieOfInjuriesOrPneumonia(injuries: true)
+        }
+        if B1 <= 2 {
+            print("NICE SHOOTIN' PARDNER---THEY DIDN'T GET MUCH")
+        } else {
+            print("SLOW ON THE DRAW---THEY GOT AT YOUR FOOD AND CLOTHES")
+        }
+        B -= 20 * B1
+        C -= B * 4
+        F -= B1 * 8
+    case 64..<69:
+        // 4560
+        print("HAIL STORM---SUPPLIES DAMAGED")
+        M -= 5 + nextRandomFraction() * 10
+        B -= 200
+        M1 -= 4 + nextRandomFraction() * 3
+    case 69..<95:
+        // 4610
+        if E == 1 {
+            illness()
+        } else if E != 3 {
+            if nextRandomFraction() > 0.25 {
+                illness()
+            }
+        } else if nextRandomFraction() < 0.5 {
+            illness()
+        }
+    case 95..<100:
+        // 4670
+        print("HELPFUL INDIANS SHOW YOU WHERE TO FIND MORE FOOD")
+        F += 14
+    default:
+        print("unexpected event: \(eventRoll)")
+    }
     
     func blizzardInMountainPass() {
         // 4970
