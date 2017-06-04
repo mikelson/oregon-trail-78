@@ -35,8 +35,9 @@ func int(value: Double) -> Double {
 }
 
 func die() {
+    // 5170
     print()
-    print("DUE T0 Y0UR UNF0RTUNATE SITUATION, THERE ARE A FEW")
+    print("DUE T0 Y0UR UNFORTUNATE SITUATION, THERE ARE A FEW")
     print("FORMALITIES WE MUST GO THROUGH")
     print("WOULD YOU LIKE A MINISTER?")
     var C$ = readLine()
@@ -283,8 +284,11 @@ while (true) {
     } else {
         print("TOTAL MILEAGE IS \(M)")
     }
-    print("FOOD\tBULLETS\tCLOTHING\tMISC. SUPP.\tCASH")
-    print("\(F)\t\t\(B)\t\(C)\t\t\t\(M1)\t\t\t\(T)")
+    func printInventory() {
+        print("FOOD\tBULLETS\tCLOTHING\tMISC. SUPP.\tCASH")
+        print("\(F)\t\t\(B)\t\(C)\t\t\t\(M1)\t\t\t\(T)")
+    }
+    printInventory()
     var X: Int
     if X1 != -1 {
         X1 *= -1
@@ -796,6 +800,72 @@ while (true) {
         ]
         print("\(daysOfWeek[Int(F9)]) ")
         // 5700
+        if D3 <= 124 {
+            D3 -= 93
+            print("JULY \(D3) 1847")
+        } else if D3 <= 155 {
+            D3 -= 124
+            print("AUGUST \(D3) 1847")
+        } else if D3 <= 185 {
+            D3 -= 155
+            print("SEPTEMBER \(D3) 1847")
+        } else if D3 <= 216 {
+            D3 -= 185
+            print("OCTOBER \(D3) 1847")
+        } else if D3 <= 246 {
+            D3 -= 216
+            print("NOVEMBER \(D3) 1847")
+        } else {
+            D3 -= 246
+            print("DECEMBER \(D3) 1847")
+        }
+        // 5920
+        print()
+        B = max(B, 0)
+        C = max(C, 0)
+        M1 = max(M1, 0)
+        T = max(T, 0)
+        F = max(F, 0)
+        printInventory()
+        print()
+        print("           PRESIDENT JAMES K. POLK SENDS YOU HIS")
+        print("                 HEARTIEST CONGRATULATIONS")
+        print()
+        print("           AND WISHES YOU A PROSPEROUS LIFE AHEAD")
+        print()
+        print("                      AT YOUR NEW HOME")
+        exit(1)
     }
     // 1240 ***SETTING DATE***
-}
+    D3 += 1
+    print()
+    let validDates = [
+        "APRIL 12",
+        "APRIL 26",
+        "MAY 10",
+        "MAY 24",
+        "JUNE 7",
+        "JUNE 21",
+        "JULY 5",
+        "JULY 19",
+        "AUGUST 2",
+        "AUGUST 16",
+        "AUGUST 31",
+        "SEPTEMBER 13",
+        "SEPTEMBER 27",
+        "OCTOBER 11",
+        "OCTOBER 25",
+        "NOVEMBER 8",
+        "NOVEMBER 22",
+        "DECEMBER 6",
+        "DECEMBER 20",
+    ]
+    if D3 >= validDates.count {
+        print("YOU HAVE BEEN ON THE TRAIL TOO LONG  ------")
+        print("YOUR FAMILY DIES IN THE FIRST BLIZZARD OF WINTER")
+        die()
+    }
+    print("MONDAY \(validDates[D3]) 1847")
+    // 1730
+    print()
+} // end of main turn loop
