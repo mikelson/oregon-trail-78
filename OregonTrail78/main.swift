@@ -89,9 +89,7 @@ func nextRandomFraction() -> Double {
 // MECC SUPPORT SERVICES 2520 BROADWAY DRIVE ST. PAUL. MN 55113
 print("DO YOU NEED INSTRUCTIONS (YES/NO)")
 
-let C$ = readLine();
-
-if C$ != "NO" {
+if readLine() != "NO" {
     print("THIS PROGRAM SIMULATES A TRIP OVER THE OREGON TRAIL FROM")
     print("INDEPENDENCE, MISSOURI TO OREGON CITY, OREGON IN 1847.")
     print("YOUR FAMILY OF FIVE WILL COVER THE 2040 MILE OREGON TRAIL")
@@ -145,49 +143,48 @@ print(" (1) ACE MARKSMAN, (2) GOOD SHOT, (3) FAIR TO MIDDLIN'")
 print(" (4) NEED MORE PRACTICE, (5) SHAKY KNEES")
 print("ENTER ONE OF THE ABOVE -- THE BETTER YOU CLAIM YOU ARE, THE")
 print("FASTER YOU'LL HAVE TO BE WITH YOUR GUN TO BE SUCCESSFUL.")
-var D9 = readInt()
-if D9 > 5 {
-    D9 = 5
+// "shootingExpertise" was "D9"
+var shootingExpertise = readInt()
+if shootingExpertise > 5 {
+    shootingExpertise = 5
 }
 
 // 6130 REM ***SHOOTING SUB-ROUTINE***
 func shoot() -> Double {
-    let S$ = ["BANG", "BLAM", "POW", "WHAM"]
-    let S6 = rand.nextInt(upperBound: S$.count)
-    print("TYPE \(S$[S6])")
+    let gunShotSounds = ["BANG", "BLAM", "POW", "WHAM"]
+    let index = rand.nextInt(upperBound: gunShotSounds.count)
+    print("TYPE \(gunShotSounds[index])")
     let start = NSDate()
-    let C$ = readLine()
-    let t = -start.timeIntervalSinceNow
-    let B1 = t - Double(D9) + 1
-    print(B1)
-    print()
-    if B1 < 0 {
+    let lineRead = readLine()
+    let t = -start.timeIntervalSinceNow - Double(shootingExpertise) + 1
+    if t < 0 {
         return 0.0
     }
-    if C$ != S$[S6] {
+    if lineRead != gunShotSounds[index] {
         return 9.0
     }
-    return B1
+    return t
 }
 
 // INITIAL PURCHASE
 
 var isInjured = false
 
-// Flag for Fort Option
-var X1 = -1
-// Flag for illness
-var S4 = 0
-// Flag for clearing South Pass
-var F1 = 0
+// Can you visit a fort this turn? Formerly "X1"
+var isFortAvailable = false
+// Do you have an illness? Formerly "S4"
+var isIll = false
+// "didClearSouthPass" was formerly "F1"
+var didClearSouthPass = false
 // Flag for clearing Blue Mountains
-var F2 = 0
+// "F2"
+var didClearBlueMountains = false
 // Total mileage whole trip
 var M = 0.0
-// Flag for clearing South Pass in setting mileage
-var M9 = 0
-// Turn number for setting date
-var D3 = 0
+// Flag for clearing South Pass in setting mileage, formerly "M9"
+var showSouthPassMileageNext = false
+// Turn number for setting date, formerly "D3"
+var turn = 0
 
 // A AMOUNT SPENT ON ANIMALS
 var A = 0.0
@@ -280,7 +277,7 @@ while (true) {
     let M2 = M
     
     // sick or injured?
-    if S4 == 1 || isInjured {
+    if isIll || isInjured {
         T -= 20
         if T < 0 {
             // 5080
@@ -290,12 +287,12 @@ while (true) {
         }
         print("DOCTOR'S BILL IS $20")
         isInjured = false
-        S4 = 0
+        isIll = false
     }
     // 1990
-    if M9 == 1 {
+    if showSouthPassMileageNext {
         print("TOTAL MILEAGE IS 950")
-        M9 = 0
+        showSouthPassMileageNext = false
     } else {
         print("TOTAL MILEAGE IS \(M)")
     }
@@ -305,8 +302,8 @@ while (true) {
     }
     printInventory()
     var X: Int
-    if X1 != -1 {
-        X1 *= -1
+    if isFortAvailable {
+        isFortAvailable = false
         print("DO YOU WANT TO (1) STOP AT THE NEXT FORT, (2) HUNT,")
         print("OR (3) CONTINUE");
         X = readInt()
@@ -324,7 +321,7 @@ while (true) {
             print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
             X = 3
         }
-        X1 *= -1
+        isFortAvailable = true
     }
     // 2270 switch
     if X == 1 {
@@ -509,7 +506,7 @@ while (true) {
                 print("SERIOUS ILLNESS---")
                 print("YOU MUST STOP FOR MEDICAL ATTENTION")
                 M1 -= 10
-                S4 = 1
+                isIll = true
             }
         }
         // 6440
@@ -713,10 +710,9 @@ while (true) {
     
     func checkForClearingPasses() {
         // 4900
-        if M >= 1700 && F2 != 1 {
+        if M >= 1700 && !didClearBlueMountains {
             // 4920
-            // Flag for clearing Blue Mountains
-            F2 = 1
+            didClearBlueMountains = true
             // 4930
             if nextRandomFraction() < 0.7 {
                 // 4970
@@ -725,16 +721,14 @@ while (true) {
         }
         // 4940
         if M <= 950 {
-            // M9 • FLAG FOR CLEARING SOUTH PASS IN SETTING MILEAGE
-            M9 = 1
+            showSouthPassMileageNext = true
         }
     }
     
     func clearSouthPass() {
         // 4860
-        // F1: flag for clearing South Pass
-        if F1 != 1 {
-            F1 = 1
+        if !didClearSouthPass {
+            didClearSouthPass = true
             // 4880
             if nextRandomFraction() < 0.8 {
                 blizzardInMountainPass()
@@ -799,7 +793,7 @@ while (true) {
         print()
         // 5510
         F9 = int(value:F9 * 14)
-        D3 = D3 * 14 + Int(F9)
+        var day = turn * 14 + Int(F9)
         F9 += 1
         if F9 >= 8 {
             F9 -= 7
@@ -815,24 +809,24 @@ while (true) {
         ]
         print("\(daysOfWeek[Int(F9)]) ")
         // 5700
-        if D3 <= 124 {
-            D3 -= 93
-            print("JULY \(D3) 1847")
-        } else if D3 <= 155 {
-            D3 -= 124
-            print("AUGUST \(D3) 1847")
-        } else if D3 <= 185 {
-            D3 -= 155
-            print("SEPTEMBER \(D3) 1847")
-        } else if D3 <= 216 {
-            D3 -= 185
-            print("OCTOBER \(D3) 1847")
-        } else if D3 <= 246 {
-            D3 -= 216
-            print("NOVEMBER \(D3) 1847")
+        if day <= 124 {
+            day -= 93
+            print("JULY \(day) 1847")
+        } else if day <= 155 {
+            day -= 124
+            print("AUGUST \(day) 1847")
+        } else if day <= 185 {
+            day -= 155
+            print("SEPTEMBER \(day) 1847")
+        } else if day <= 216 {
+            day -= 185
+            print("OCTOBER \(day) 1847")
+        } else if day <= 246 {
+            day -= 216
+            print("NOVEMBER \(day) 1847")
         } else {
-            D3 -= 246
-            print("DECEMBER \(D3) 1847")
+            day -= 246
+            print("DECEMBER \(day) 1847")
         }
         // 5920
         print()
@@ -852,7 +846,7 @@ while (true) {
         exit(1)
     }
     // 1240 ***SETTING DATE***
-    D3 += 1
+    turn += 1
     print()
     let validDates = [
         "APRIL 12",
@@ -875,12 +869,12 @@ while (true) {
         "DECEMBER 6",
         "DECEMBER 20",
     ]
-    if D3 >= validDates.count {
+    if turn >= validDates.count {
         print("YOU HAVE BEEN ON THE TRAIL TOO LONG  ------")
         print("YOUR FAMILY DIES IN THE FIRST BLIZZARD OF WINTER")
         die()
     }
-    print("MONDAY \(validDates[D3]) 1847")
+    print("MONDAY \(validDates[turn]) 1847")
     // 1730
     print()
 } // end of main turn loop
