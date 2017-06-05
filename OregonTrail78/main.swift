@@ -143,7 +143,7 @@ print(" (1) ACE MARKSMAN, (2) GOOD SHOT, (3) FAIR TO MIDDLIN'")
 print(" (4) NEED MORE PRACTICE, (5) SHAKY KNEES")
 print("ENTER ONE OF THE ABOVE -- THE BETTER YOU CLAIM YOU ARE, THE")
 print("FASTER YOU'LL HAVE TO BE WITH YOUR GUN TO BE SUCCESSFUL.")
-// "shootingExpertise" was "D9"
+// ("shootingExpertise" was "D9")
 var shootingExpertise = readInt()
 if shootingExpertise > 5 {
     shootingExpertise = 5
@@ -166,45 +166,59 @@ func shoot() -> Double {
     return t
 }
 
-// INITIAL PURCHASE
-
 var isInjured = false
 
-// Can you visit a fort this turn? Formerly "X1"
+// Can you visit a fort this turn? (Was "X1")
 var isFortAvailable = false
-// Do you have an illness? Formerly "S4"
+// Do you have an illness? (Was "S4")
 var isIll = false
-// "didClearSouthPass" was formerly "F1"
+// ("didClearSouthPass" was "F1")
 var didClearSouthPass = false
-// Flag for clearing Blue Mountains
-// "F2"
+// Flag for clearing Blue Mountains (was "F2")
 var didClearBlueMountains = false
 // Total mileage whole trip
+// TODO rename
 var M = 0.0
-// Flag for clearing South Pass in setting mileage, formerly "M9"
+// Flag for clearing South Pass in setting mileage (was "M9")
 var showSouthPassMileageNext = false
-// Turn number for setting date, formerly "D3"
+// Turn number for setting date (was "D3")
 var turn = 0
 
-// A AMOUNT SPENT ON ANIMALS
-var A = 0.0
-var F = 0.0
-var B = 0.0
-var C = 0.0
-var M1 = 0.0
-// T • CASH LEFT OVER AFTER INITIAL PURCHASES
-var T = 700.0
+// What's in your wagon?
+class Inventory {
+    // Value of animals pulling the wagon, aka oxen (was "A")
+    var animals = 0.0
+    // Amount of food remaining (was "F")
+    var food = 0.0
+    // Bullets remaining (was "B")
+    var bullets = 0.0
+    // Value of clothing - protection against cold weather (was "C")
+    var clothing = 0.0
+    // Amount spent on "miscellaneous supplies" - basically medicine (was "M1")
+    var misc = 0.0
+    // Cash dollars remaining (was "T")
+    var cash = 700.0
+    
+    func printSummary() {
+        // Note that "animals" is not printed, even though I want to know sometimes.
+        print("FOOD\tBULLETS\tCLOTHING\tMISC. SUPP.\tCASH")
+        print("\(food)\t\t\(bullets)\t\(clothing)\t\t\t\(misc)\t\t\t\(cash)")
+    }
+}
+let inventory = Inventory()
+
+// INITIAL PURCHASE
 while true {
     print()
     print()
     while true {
         print("HOW MUCH DO YOU WANT TO SPEND ON YOUR OXEN TEAM")
-        A = readDouble()
-        if A < 200 {
+        inventory.animals = readDouble()
+        if inventory.animals < 200 {
             print("NOT ENOUGH")
             continue
         }
-        if A > 300 {
+        if inventory.animals > 300 {
             print("TOO MUCH")
             continue
         }
@@ -222,24 +236,24 @@ while true {
             return value;
         }
     }
-    F = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON FOOD")
+    inventory.food = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON FOOD")
     
-    B = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON AMMUNITION")
+    inventory.bullets = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON AMMUNITION")
     
-    C = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON CLOTHING")
+    inventory.clothing = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON CLOTHING")
     
-    M1 = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON MISCELLANEOUS SUPPLIES")
+    inventory.misc = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON MISCELLANEOUS SUPPLIES")
     
-    T = 700.0 - A - F - B - C - M1
-    if T < 0 {
+    inventory.cash = 700.0 - inventory.animals - inventory.food - inventory.bullets - inventory.clothing - inventory.misc
+    if inventory.cash < 0 {
         print("YOU OVERSPENT—YOU ONLY HAD $700 TO SPEND. BUY AGAIN")
         continue
     }
-    print("AFTER ALL YOUR PURCHASES, YOU NOW HAVE \(T) DOLLARS LEFT")
+    print("AFTER ALL YOUR PURCHASES, YOU NOW HAVE \(inventory.cash) DOLLARS LEFT")
     break
 }
 // 2 cents per bullet
-B *= 50
+inventory.bullets *= 50
 
 // 1190
 print()
@@ -251,26 +265,26 @@ while (true) {
     // 1740
     // ***BEGINNING EACH TURN***
     // 1750
-    if F < 0 {
-        F = 0
+    if inventory.food < 0 {
+        inventory.food = 0
     }
-    if B < 0 {
-        B = 0
+    if inventory.bullets < 0 {
+        inventory.bullets = 0
     }
-    if C < 0 {
-        C = 0
+    if inventory.clothing < 0 {
+        inventory.clothing = 0
     }
-    if M1 < 0 {
-        M1 = 0
+    if inventory.misc < 0 {
+        inventory.misc = 0
     }
-    if F < 13 {
+    if inventory.food < 13 {
         print("YOU'D BETTER DO SOME HUNTING OR BUY FOOD AND SOON!!!!")
     }
-    F = int(value: F)
-    B = int(value: B)
-    C = int(value: C)
-    M1 = int(value: M1)
-    T = int(value: T)
+    inventory.food = int(value: inventory.food)
+    inventory.bullets = int(value: inventory.bullets)
+    inventory.clothing = int(value: inventory.clothing)
+    inventory.misc = int(value: inventory.misc)
+    inventory.cash = int(value: inventory.cash)
     M = int(value: M)
     
     // M2 • TOTAL MILEAGE UP THROUGH PREVIOUS TURN
@@ -278,10 +292,10 @@ while (true) {
     
     // sick or injured?
     if isIll || isInjured {
-        T -= 20
-        if T < 0 {
+        inventory.cash -= 20
+        if inventory.cash < 0 {
             // 5080
-            T = 0
+            inventory.cash = 0
             print("YOU CAN'T AFFORD A DOCTOR")
             dieOfLackOfMedicalSupplies(injuries: isInjured)
         }
@@ -296,11 +310,9 @@ while (true) {
     } else {
         print("TOTAL MILEAGE IS \(M)")
     }
-    func printInventory() {
-        print("FOOD\tBULLETS\tCLOTHING\tMISC. SUPP.\tCASH")
-        print("\(F)\t\t\(B)\t\(C)\t\t\t\(M1)\t\t\t\(T)")
-    }
-    printInventory()
+
+    inventory.printSummary()
+    
     var X: Int
     if isFortAvailable {
         isFortAvailable = false
@@ -317,7 +329,7 @@ while (true) {
             X = 2
         }
         X += 1
-        if X == 2 && B < 40 {
+        if X == 2 && inventory.bullets < 40 {
             print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
             X = 3
         }
@@ -333,31 +345,31 @@ while (true) {
                 // keeping this interesting exploit
                 return P
             }
-            T -= P
-            if T >= 0 {
+            inventory.cash -= P
+            if inventory.cash >= 0 {
                 return P
             }
             print("YOU DON'T HAVE THAT MUCH--KEEP YOUR SPENDING DOWN")
             print("YOU MISS YOUR CHANCE TO SPEND ON THAT ITEM")
-            T += P
+            inventory.cash += P
             P = 0
             return 0
         }
         print("FOOD")
-        F += 2 / 3 * spend()
+        inventory.food += 2 / 3 * spend()
         print("AMMUNITION")
-        B = int(value: B + 2 / 3 * spend() * 50)
+        inventory.bullets = int(value: inventory.bullets + 2 / 3 * spend() * 50)
         print("CLOTHING")
-        C += 2 / 3 * spend()
+        inventory.clothing += 2 / 3 * spend()
         print("MISCELLANEOUS SUPPLIES")
-        M1 += 2 / 3 * spend()
+        inventory.misc += 2 / 3 * spend()
         M -= 45
     } else if X == 2 {
         // ***HUNTING***
-        if B < 40 {
+        if inventory.bullets < 40 {
             print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
             // Basic code is GOTO 2080, which could let you stop at fort, even if it is not a fort turn...
-            // TODO just don't show hunt option if B < 40
+            // TODO just don't show hunt option if inventory.bullets < 40
             // for now, just continue...
         } else {
             M -= 45
@@ -367,20 +379,20 @@ while (true) {
                 if 100.0 * Double(rand.nextUniform()) < 13.0 * B1 {
                     print("YOU MISSED---AND YOUR DINNER GOT AWAY.....")
                 } else {
-                    F += 48 - 2 * B1
+                    inventory.food += 48 - 2 * B1
                     print("NICE SHOT--RIGHT ON TARGET--GOOD EATIN' TONIGHT!!")
-                    B -= 10 + 3 * B1
+                    inventory.bullets -= 10 + 3 * B1
                 }
             } else {
                 print("RIGHT BETWEEN THE EYES---YOU GOT A BIG ONE!!!!")
                 print("FULL BELLIES TONIGHT!")
-                F += 52 + nextRandomFraction() * 6
-                B -= 10 + nextRandomFraction() * 4
+                inventory.food += 52 + nextRandomFraction() * 6
+                inventory.bullets -= 10 + nextRandomFraction() * 4
             }
         }
     }
     // 2720 continuing on
-    if F < 13 {
+    if inventory.food < 13 {
         print("YOU RAN OUT OF FOOD AND STARVED TO DEATH")
         die()
     }
@@ -393,15 +405,15 @@ while (true) {
         if E < 1 || E > 3 {
             continue
         }
-        F -= Double(8 + 5 * E)
-        if F < 0 {
-            F += Double(8 + 5 * E)
+        inventory.food -= Double(8 + 5 * E)
+        if inventory.food < 0 {
+            inventory.food += Double(8 + 5 * E)
             print("YOU CAN'T EAT THAT WELL")
             continue
         }
         break
     }
-    M += 200 + (A - 220) / 5 + 10 * nextRandomFraction()
+    M += 200 + (inventory.animals - 220) / 5 + 10 * nextRandomFraction()
     // FLAG FOR BLIZZARD
     var L1 = 0
     // FLAG FOR INSUFFICIENT CLOTHING IN COLD WEATHER
@@ -441,19 +453,19 @@ while (true) {
             if T1 < 2 {
                 // run
                 M += 20
-                M1 -= 15
-                B -= 150
-                A -= 40
+                inventory.misc -= 15
+                inventory.bullets -= 150
+                inventory.animals -= 40
             } else if T1 == 2 {
                 // attack
                 let B1 = shoot()
-                B -= B1 * 40 + 50
+                inventory.bullets -= B1 * 40 + 50
                 shootRiders(B1: B1)
             } else if T1 == 3 {
                 // continue
                 if nextRandomFraction() <= 0.8 {
-                    B -= 150
-                    M1 -= 15
+                    inventory.bullets -= 150
+                    inventory.misc -= 15
                 } else {
                     // 3450
                     print("THEY DID NOT ATTACK")
@@ -461,12 +473,12 @@ while (true) {
             } else {
                 // circle wagons
                 let B1 = shoot()
-                B -= B1 * 30 + 50
+                inventory.bullets -= B1 * 30 + 50
                 M -= 25
                 shootRiders(B1: B1)
             }
             print("RIDERS WERE HOSTILE-- CHECK FOR LOSSES")
-            if B < 0 {
+            if inventory.bullets < 0 {
                 print("YOU RAN OUT OF BULLETS AND GOT MASSACRED BY THE RIDERS")
                 die()
             }
@@ -475,11 +487,11 @@ while (true) {
             if T1 < 2 {
                 // run
                 M += 15
-                A -= 10
+                inventory.animals -= 10
             } else if T1 == 2 {
                 // attack
                 M -= 5
-                B -= 100
+                inventory.bullets -= 100
             } else if T1 == 4 {
                 // circle wagons
                 M -= 20
@@ -495,23 +507,22 @@ while (true) {
         if 100 * nextRandomFraction() < percent {
             print("MILD ILLNESS---MEDICINE USED")
             M -= 5
-            M1 -= 2
+            inventory.misc -= 2
         } else {
             percent = 100.0 - (40.0 / pow(4.0, Double(E) - 1.0))
             if 100 * nextRandomFraction() < percent {
                 print("BAD ILLNESS---MEDICINE USED")
                 M -= 5
-                M1 -= 5
+                inventory.misc -= 5
             } else {
                 print("SERIOUS ILLNESS---")
                 print("YOU MUST STOP FOR MEDICAL ATTENTION")
-                M1 -= 10
+                inventory.misc -= 10
                 isIll = true
             }
         }
         // 6440
-        // M1: amount spent on misc supplies
-        if M1 < 0 {
+        if inventory.misc < 0 {
             dieOfLackOfMedicalSupplies(injuries: isInjured)
         }
     }
@@ -524,18 +535,18 @@ while (true) {
         // 3660
         print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT")
         M -= 15 + 5 * nextRandomFraction()
-        M1 -= 8
+        inventory.misc -= 8
     case 6..<11:
         // 3700
         print("OX INJURES LEG--SLOWS YOU DOWN REST OF TRIP")
         M -= 25
-        A -= 20
+        inventory.animals -= 20
     case 11..<13:
         // 3740
         print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM")
         print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING")
         M -= 5 + 4 * nextRandomFraction()
-        M1 -= 2 + 3 * nextRandomFraction()
+        inventory.misc -= 2 + 3 * nextRandomFraction()
     case 13..<15:
         // 3790
         print("OX WANDERS OFF---SPEND TIME LOOKING FOR IT")
@@ -552,14 +563,14 @@ while (true) {
         // 3880
         if M <= 950 {
             print("HEAVY RAINS---TIME AND SUPPLIES LOST")
-            F -= 10
-            B -= 500
-            M1 -= 15
+            inventory.food -= 10
+            inventory.bullets -= 500
+            inventory.misc -= 15
             M -= 10 * nextRandomFraction() + 5
         } else {
             // 4490
             print("COLD WEATHER---BRRRRRRR!---YOU")
-            if C <= 22 + 4 * nextRandomFraction() {
+            if inventory.clothing <= 22 + 4 * nextRandomFraction() {
                 print("DON'T")
                 C1 = 1
             } // lse 4530
@@ -572,30 +583,30 @@ while (true) {
         // 3960
         print("BANDITS ATTACK")
         var B1 = shoot()
-        B -= 20 * B1
-        if B >= 0 && B1 <= 1 {
+        inventory.bullets -= 20 * B1
+        if inventory.bullets >= 0 && B1 <= 1 {
             // 4100
             print("QUICKEST DRAW OUTSIDE OF DODGE CITY!!!")
             print("YOU GOT 'EM!")
         } else {
-            if B < 0 {
+            if inventory.bullets < 0 {
                 // 4000
                 print("YOU RAN OUT OF BULLETS---THEY GET LOTS OF CASH")
                 // 4010
-                T /= 3
+                inventory.cash /= 3
             }
             print("YOU GOT SHOT IN THE LEG AND THEY TOOK ONE OF YOUR OXEN")
             isInjured = true
             print("BETTER HAVE A DOC LOOK AT YOUR WOUND")
-            M1 -= 5
-            A -= 20
+            inventory.misc -= 5
+            inventory.animals -= 20
         }
     case 35..<37:
         // 4130
         print("THERE WAS A FIRE IN YOUR WAGON—FOOD AND SUPPLIES DAMAGE!")
-        F -= 40
-        B -= 400
-        M1 -= nextRandomFraction() * 8 + 3
+        inventory.food -= 40
+        inventory.bullets -= 400
+        inventory.misc -= nextRandomFraction() * 8 + 3
         M -= 15
     case 37..<42:
         // 4190
@@ -604,23 +615,23 @@ while (true) {
     case 42..<44:
         // 4220
         print("YOU KILLED A POISONOUS SNAKE AFTER IT BIT YOU")
-        B -= 10
-        M1 -= 5
-        if M1 < 0 {
+        inventory.bullets -= 10
+        inventory.misc -= 5
+        if inventory.misc < 0 {
             print("YOU DIE OF SNAKEBITE SINCE YOU HAVE NO MEDICINE")
             die()
         }
     case 44..<54:
         // 4290
         print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES")
-        F -= 30
-        C -= 20
+        inventory.food -= 30
+        inventory.clothing -= 20
         M -= 20 + 20 * nextRandomFraction()
     case 54..<64:
         // 4340
         print("WILD ANIMALS ATTACK!")
         var B1 = shoot()
-        if B < 40 {
+        if inventory.bullets < 40 {
             print("YOU WERE TOO LOW ON BULLETS")
             print("THE WOLVES OVERPOWERED YOU")
             isInjured = true
@@ -631,15 +642,15 @@ while (true) {
         } else {
             print("SLOW ON THE DRAW---THEY GOT AT YOUR FOOD AND CLOTHES")
         }
-        B -= 20 * B1
-        C -= B * 4
-        F -= B1 * 8
+        inventory.bullets -= 20 * B1
+        inventory.clothing -= B1 * 4
+        inventory.food -= B1 * 8
     case 64..<69:
         // 4560
         print("HAIL STORM---SUPPLIES DAMAGED")
         M -= 5 + nextRandomFraction() * 10
-        B -= 200
-        M1 -= 4 + nextRandomFraction() * 3
+        inventory.bullets -= 200
+        inventory.misc -= 4 + nextRandomFraction() * 3
     case 69..<95:
         // 4610
         if E == 1 {
@@ -654,7 +665,7 @@ while (true) {
     case 95..<100:
         // 4670
         print("HELPFUL INDIANS SHOW YOU WHERE TO FIND MORE FOOD")
-        F += 14
+        inventory.food += 14
     default:
         print("unexpected event: \(eventRoll)")
     }
@@ -664,12 +675,12 @@ while (true) {
         print("BLIZZARD IN MOUNTAIN PASS--TIME AND SUPPLIES LOST")
         // L1: flag for blizzard
         L1 = 1
-        F -= 25
-        M1 -= 10
-        B -= 300
+        inventory.food -= 25
+        inventory.misc -= 10
+        inventory.bullets -= 300
         M -= 30 + 40 * nextRandomFraction()
         // 5030
-        if C < 18 + 2 * nextRandomFraction() {
+        if inventory.clothing < 18 + 2 * nextRandomFraction() {
             illness()
         }
     }
@@ -728,8 +739,8 @@ while (true) {
                 // 4780
                 if nextRandomFraction() <= 0.11 {
                     print("WAGON DAMAGED!---LOSE TIME AND SUPPLIES")
-                    M1 -= 5
-                    B -= 200
+                    inventory.misc -= 5
+                    inventory.bullets -= 200
                     M -= 20 + 30 * nextRandomFraction()
                 } else {
                     // 4840
@@ -750,7 +761,7 @@ while (true) {
         // F9: fraction of two weeks traveled on final turn
         var F9 = (2040 - M2) / (M - M2)
         let inverse = 1 - F9
-        F += inverse * (8.0 + 5.0 * Double(E))
+        inventory.food += inverse * (8.0 + 5.0 * Double(E))
         print()
         // 5470
         print("YOU FINALLY ARRIVED AT OREGON CITY")
@@ -796,12 +807,12 @@ while (true) {
         }
         // 5920
         print()
-        B = max(B, 0)
-        C = max(C, 0)
-        M1 = max(M1, 0)
-        T = max(T, 0)
-        F = max(F, 0)
-        printInventory()
+        inventory.bullets = max(inventory.bullets, 0)
+        inventory.clothing = max(inventory.clothing, 0)
+        inventory.misc = max(inventory.misc, 0)
+        inventory.cash = max(inventory.cash, 0)
+        inventory.food = max(inventory.food, 0)
+        inventory.printSummary()
         print()
         print("           PRESIDENT JAMES K. POLK SENDS YOU HIS")
         print("                 HEARTIEST CONGRATULATIONS")
