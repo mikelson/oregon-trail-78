@@ -397,23 +397,32 @@ while (true) {
         die()
     }
     // ***EATING***
-    var E = 0
+    // Eating poorly (1) greatly increases the likelihood and severity of illness.
+    // Eating well (3) decreases the probablity and severity of illness.
+    var eatingRate = 0
+    func getFoodConsumedThisTurn() -> Double {
+        return Double(8 + 5 * eatingRate)
+    }
     while true {
         print("DO YOU WANT TO EAT (1) POORLY  (2) MODERATELY")
         print("OR (3) WELL")
-        E = readInt()
-        if E < 1 || E > 3 {
+        eatingRate = readInt()
+        if eatingRate < 1 || eatingRate > 3 {
             continue
         }
-        inventory.food -= Double(8 + 5 * E)
-        if inventory.food < 0 {
-            inventory.food += Double(8 + 5 * E)
+        // Consume 13, 18, or 23 foods
+        let food = inventory.food - getFoodConsumedThisTurn()
+        if food < 0.0 {
             print("YOU CAN'T EAT THAT WELL")
             continue
         }
+        inventory.food = food
         break
     }
+
+    // Actually advance along the trail!
     M += 200 + (inventory.animals - 220) / 5 + 10 * nextRandomFraction()
+
     // FLAG FOR BLIZZARD
     var L1 = 0
     // FLAG FOR INSUFFICIENT CLOTHING IN COLD WEATHER
@@ -503,13 +512,15 @@ while (true) {
     func illness() {
         // 6290 REM ***ILLNESS SUB-ROUTINE***
         // 6300
-        var percent = 10 + 35.0 * Double(E - 1)
+        // 10, 45, or 80
+        var percent = 10 + 35.0 * Double(eatingRate - 1)
         if 100 * nextRandomFraction() < percent {
             print("MILD ILLNESS---MEDICINE USED")
             M -= 5
             inventory.misc -= 2
         } else {
-            percent = 100.0 - (40.0 / pow(4.0, Double(E) - 1.0))
+            // 60, 90, or 97.5
+            percent = 100.0 - (40.0 / pow(4.0, Double(eatingRate) - 1.0))
             if 100 * nextRandomFraction() < percent {
                 print("BAD ILLNESS---MEDICINE USED")
                 M -= 5
@@ -653,9 +664,9 @@ while (true) {
         inventory.misc -= 4 + nextRandomFraction() * 3
     case 69..<95:
         // 4610
-        if E == 1 {
+        if eatingRate == 1 {
             illness()
-        } else if E != 3 {
+        } else if eatingRate != 3 {
             if nextRandomFraction() > 0.25 {
                 illness()
             }
@@ -761,7 +772,7 @@ while (true) {
         // F9: fraction of two weeks traveled on final turn
         var F9 = (2040 - M2) / (M - M2)
         let inverse = 1 - F9
-        inventory.food += inverse * (8.0 + 5.0 * Double(E))
+        inventory.food += inverse * getFoodConsumedThisTurn()
         print()
         // 5470
         print("YOU FINALLY ARRIVED AT OREGON CITY")
