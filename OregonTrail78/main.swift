@@ -318,21 +318,28 @@ while (true) {
         case stopAtFort = 1, hunt, continueOn
     }
     var action: Action
-    if isFortAvailable {
-        isFortAvailable = false
-        print("DO YOU WANT TO (1) STOP AT THE NEXT FORT, (2) HUNT,")
-        print("OR (3) CONTINUE");
-        action = Action(rawValue: readInt()) ?? Action.continueOn
-    } else {
-        print("DO YOU WANT TO (1) HUNT, OR (2) CONTINUE")
-        let intRead = readInt()
-        action = intRead == 0 ? Action.continueOn : (Action(rawValue: intRead + 1) ?? Action.continueOn)
+    repeat {
+        if isFortAvailable {
+            print("DO YOU WANT TO (1) STOP AT THE NEXT FORT, (2) HUNT,")
+            print("OR (3) CONTINUE");
+            action = Action(rawValue: readInt()) ?? Action.continueOn
+        } else {
+            print("DO YOU WANT TO (1) HUNT, OR (2) CONTINUE")
+            let intRead = readInt()
+            action = intRead == 0 ? Action.continueOn : (Action(rawValue: intRead + 1) ?? Action.continueOn)
+        }
         if action == Action.hunt && inventory.bullets < 40 {
             print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
+            if (isFortAvailable) {
+                // Let user pick from stop or hunt.
+                continue
+            }
+            // No fort... automatically assign the only option
             action = Action.continueOn
         }
-        isFortAvailable = true
-    }
+        isFortAvailable = !isFortAvailable
+        break
+    } while true
     // 2270 switch
     switch action {
     case Action.stopAtFort:
@@ -363,30 +370,22 @@ while (true) {
         inventory.misc += 2 / 3 * spend()
         M -= 45
     case Action.hunt:
-        if inventory.bullets < 40 {
-            assert(isFortAvailable)
-            print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
-            // Basic code is GOTO 2080, which lets you choose fort or continue instead
-            // TODO just don't show hunt option if inventory.bullets < 40, or loop until legal action picked, like BASIC
-            // for now, just continue...
-        } else {
-            M -= 45
-            // 2580 GOSUB 6140
-            var B1 = shoot()
-            if B1 > 1 {
-                if 100.0 * Double(rand.nextUniform()) < 13.0 * B1 {
-                    print("YOU MISSED---AND YOUR DINNER GOT AWAY.....")
-                } else {
-                    inventory.food += 48 - 2 * B1
-                    print("NICE SHOT--RIGHT ON TARGET--GOOD EATIN' TONIGHT!!")
-                    inventory.bullets -= 10 + 3 * B1
-                }
+        M -= 45
+        // 2580 GOSUB 6140
+        var B1 = shoot()
+        if B1 > 1 {
+            if 100.0 * Double(rand.nextUniform()) < 13.0 * B1 {
+                print("YOU MISSED---AND YOUR DINNER GOT AWAY.....")
             } else {
-                print("RIGHT BETWEEN THE EYES---YOU GOT A BIG ONE!!!!")
-                print("FULL BELLIES TONIGHT!")
-                inventory.food += 52 + nextRandomFraction() * 6
-                inventory.bullets -= 10 + nextRandomFraction() * 4
+                inventory.food += 48 - 2 * B1
+                print("NICE SHOT--RIGHT ON TARGET--GOOD EATIN' TONIGHT!!")
+                inventory.bullets -= 10 + 3 * B1
             }
+        } else {
+            print("RIGHT BETWEEN THE EYES---YOU GOT A BIG ONE!!!!")
+            print("FULL BELLIES TONIGHT!")
+            inventory.food += 52 + nextRandomFraction() * 6
+            inventory.bullets -= 10 + nextRandomFraction() * 4
         }
     case Action.continueOn:
         break
