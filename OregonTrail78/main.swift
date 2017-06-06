@@ -176,9 +176,8 @@ var isIll = false
 var didClearSouthPass = false
 // Flag for clearing Blue Mountains (was "F2")
 var didClearBlueMountains = false
-// Total mileage whole trip
-// TODO rename
-var M = 0.0
+// Total mileage whole trip (was "M")
+var mileage = 0.0
 // Flag for clearing South Pass in setting mileage (was "M9")
 var showSouthPassMileageNext = false
 // Turn number for setting date (was "D3")
@@ -286,10 +285,10 @@ while (true) {
     inventory.clothing = int(value: inventory.clothing)
     inventory.misc = int(value: inventory.misc)
     inventory.cash = int(value: inventory.cash)
-    M = int(value: M)
+    mileage = int(value: mileage)
     
     // (mileageThroughPreviousTurn was "M2")
-    let mileageThroughPreviousTurn = M
+    let mileageThroughPreviousTurn = mileage
     
     // sick or injured?
     if isIll || isInjured {
@@ -309,7 +308,7 @@ while (true) {
         print("TOTAL MILEAGE IS 950")
         showSouthPassMileageNext = false
     } else {
-        print("TOTAL MILEAGE IS \(M)")
+        print("TOTAL MILEAGE IS \(mileage)")
     }
 
     inventory.printSummary()
@@ -372,9 +371,9 @@ while (true) {
         inventory.clothing += fortInflation * spend()
         print("MISCELLANEOUS SUPPLIES")
         inventory.misc += fortInflation * spend()
-        M -= 45
+        mileage -= 45
     case Action.hunt:
-        M -= 45
+        mileage -= 45
         // 2580 GOSUB 6140
         var shotSpeed = shoot()
         if shotSpeed > 1 {
@@ -425,10 +424,10 @@ while (true) {
     }
 
     // Actually advance along the trail!
-    M += 200 + (inventory.animals - 220) / 5 + 10 * nextRandomFraction()
+    mileage += 200 + (inventory.animals - 220) / 5 + 10 * nextRandomFraction()
 
     // ***RIDERS ATTACK***
-    let riderMileageSquare = pow(M / 100 - 4, 2)
+    let riderMileageSquare = pow(mileage / 100 - 4, 2)
     if nextRandomFraction() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
         print("RIDERS AHEAD.  THEY ")
         // (was "S5")
@@ -479,11 +478,11 @@ while (true) {
             case Tactics.circleWagons:
                 let shotSpeed = shoot()
                 inventory.bullets -= shotSpeed * 30 + 50
-                M -= 25
+                mileage -= 25
                 shootRiders(shotSpeed: shotSpeed)
             default:
                 // run or invalid
-                M += 20
+                mileage += 20
                 inventory.misc -= 15
                 inventory.bullets -= 150
                 inventory.animals -= 40
@@ -500,13 +499,13 @@ while (true) {
             switch tactics {
             case Tactics.run:
                 // run or invalid
-                M += 15
+                mileage += 15
                 inventory.animals -= 10
             case Tactics.attack:
-                M -= 5
+                mileage -= 5
                 inventory.bullets -= 100
             case Tactics.circleWagons:
-                M -= 20
+                mileage -= 20
             default:
                 // continueOn or invalid
                 break
@@ -522,14 +521,14 @@ while (true) {
         var percent = 10 + 35.0 * Double(eatingRate - 1)
         if 100 * nextRandomFraction() < percent {
             print("MILD ILLNESS---MEDICINE USED")
-            M -= 5
+            mileage -= 5
             inventory.misc -= 2
         } else {
             // 60, 90, or 97.5
             percent = 100.0 - (40.0 / pow(4.0, Double(eatingRate) - 1.0))
             if 100 * nextRandomFraction() < percent {
                 print("BAD ILLNESS---MEDICINE USED")
-                M -= 5
+                mileage -= 5
                 inventory.misc -= 5
             } else {
                 print("SERIOUS ILLNESS---")
@@ -551,39 +550,39 @@ while (true) {
     case 0..<6:
         // 3660
         print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT")
-        M -= 15 + 5 * nextRandomFraction()
+        mileage -= 15 + 5 * nextRandomFraction()
         inventory.misc -= 8
     case 6..<11:
         // 3700
         print("OX INJURES LEG--SLOWS YOU DOWN REST OF TRIP")
-        M -= 25
+        mileage -= 25
         inventory.animals -= 20
     case 11..<13:
         // 3740
         print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM")
         print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING")
-        M -= 5 + 4 * nextRandomFraction()
+        mileage -= 5 + 4 * nextRandomFraction()
         inventory.misc -= 2 + 3 * nextRandomFraction()
     case 13..<15:
         // 3790
         print("OX WANDERS OFF---SPEND TIME LOOKING FOR IT")
-        M -= 17
+        mileage -= 17
     case 15..<17:
         // 3820
         print("YOUR SON GETS LOST---SPEND HALF THE DAY LOOKING FOR HIM")
-        M -= 10
+        mileage -= 10
     case 17..<22:
         // 3850
         print("UNSAFE WATER--LOSE TIME LOOKING FOR CLEAN SPRING")
-        M -= 10 * nextRandomFraction() + 2
+        mileage -= 10 * nextRandomFraction() + 2
     case 22..<32:
         // 3880
-        if M <= 950 {
+        if mileage <= 950 {
             print("HEAVY RAINS---TIME AND SUPPLIES LOST")
             inventory.food -= 10
             inventory.bullets -= 500
             inventory.misc -= 15
-            M -= 10 * nextRandomFraction() + 5
+            mileage -= 10 * nextRandomFraction() + 5
         } else {
             // 4490
             print("COLD WEATHER---BRRRRRRR!---YOU")
@@ -624,11 +623,11 @@ while (true) {
         inventory.food -= 40
         inventory.bullets -= 400
         inventory.misc -= nextRandomFraction() * 8 + 3
-        M -= 15
+        mileage -= 15
     case 37..<42:
         // 4190
         print("LOSE YOUR WAY IN HEAVY FOG---TIME IS LOST")
-        M -= 10 + 5 * nextRandomFraction()
+        mileage -= 10 + 5 * nextRandomFraction()
     case 42..<44:
         // 4220
         print("YOU KILLED A POISONOUS SNAKE AFTER IT BIT YOU")
@@ -643,7 +642,7 @@ while (true) {
         print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES")
         inventory.food -= 30
         inventory.clothing -= 20
-        M -= 20 + 20 * nextRandomFraction()
+        mileage -= 20 + 20 * nextRandomFraction()
     case 54..<64:
         // 4340
         print("WILD ANIMALS ATTACK!")
@@ -665,7 +664,7 @@ while (true) {
     case 64..<69:
         // 4560
         print("HAIL STORM---SUPPLIES DAMAGED")
-        M -= 5 + nextRandomFraction() * 10
+        mileage -= 5 + nextRandomFraction() * 10
         inventory.bullets -= 200
         inventory.misc -= 4 + nextRandomFraction() * 3
     case 69..<95:
@@ -693,7 +692,7 @@ while (true) {
         inventory.food -= 25
         inventory.misc -= 10
         inventory.bullets -= 300
-        M -= 30 + 40 * nextRandomFraction()
+        mileage -= 30 + 40 * nextRandomFraction()
         // 5030
         if inventory.clothing < 18 + 2 * nextRandomFraction() {
             illness()
@@ -702,7 +701,7 @@ while (true) {
     
     func checkForClearingPasses() {
         // 4900
-        if M >= 1700 && !didClearBlueMountains {
+        if mileage >= 1700 && !didClearBlueMountains {
             // 4920
             didClearBlueMountains = true
             // 4930
@@ -712,7 +711,7 @@ while (true) {
             }
         }
         // 4940
-        if M <= 950 {
+        if mileage <= 950 {
             showSouthPassMileageNext = true
         }
     }
@@ -735,33 +734,33 @@ while (true) {
     
     // 4700 ***MOUNTAINS***
     // 4710
-    if M > 950 {
+    if mileage > 950 {
         // 4720
-        var square = pow(M / 100 - 15, 2.0)
-        // At M==950, nextRandomFraction()*10 must be <= 6.58 for rugged mountains
-        // At M==1200, rhs==5.14
-        // At M==1500, square is 0, rhs==3
-        // At M==1800, rhs==5.14
-        // Distribution is V shaped trough with minimum at M==1500 and maximum of 8 for large M.
+        var square = pow(mileage / 100 - 15, 2.0)
+        // At mileage==950, nextRandomFraction()*10 must be <= 6.58 for rugged mountains
+        // At mileage==1200, rhs==5.14
+        // At mileage==1500, square is 0, rhs==3
+        // At mileage==1800, rhs==5.14
+        // Distribution is V shaped trough with minimum at mileage==1500 and maximum of 8 for large mileage.
         // See "Occurrence of 'Rugged Mountains' as a function of mileage" in the paper.
         if nextRandomFraction() * 10 <= 9 - (square + 72)/(square + 12) {
             print("RUGGED MOUNTAINS")
             if nextRandomFraction() <= 0.1 {
                 // 4750
                 print("YOU GOT LOST---LOSE VALUABLE TIME TRYING TO FIND TRAIL!")
-                M -= 60
+                mileage -= 60
             } else {
                 // 4780
                 if nextRandomFraction() <= 0.11 {
                     print("WAGON DAMAGED!---LOSE TIME AND SUPPLIES")
                     inventory.misc -= 5
                     inventory.bullets -= 200
-                    M -= 20 + 30 * nextRandomFraction()
+                    mileage -= 20 + 30 * nextRandomFraction()
                 } else {
                     // 4840
                     print("THE GOING GETS SLOW")
                     // 4850
-                    M -= 45 + nextRandomFraction() / 0.02
+                    mileage -= 45 + nextRandomFraction() / 0.02
                 }
             }
             
@@ -771,11 +770,11 @@ while (true) {
     }
     // 1230
     let oregonCityDistance = 2040.0
-    if M >= oregonCityDistance {
+    if mileage >= oregonCityDistance {
         // 5420 ***FINAL TURN***
         // 5430
         // fraction of two weeks traveled on final turn (was "F9")
-        let fraction = (oregonCityDistance - mileageThroughPreviousTurn) / (M - mileageThroughPreviousTurn)
+        let fraction = (oregonCityDistance - mileageThroughPreviousTurn) / (mileage - mileageThroughPreviousTurn)
         let inverse = 1 - fraction
         inventory.food += inverse * getFoodConsumedThisTurn()
         print()
