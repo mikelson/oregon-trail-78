@@ -253,7 +253,8 @@ while true {
     break
 }
 // 2 cents per bullet
-inventory.bullets *= 50
+let bulletsPerDollar = 50.0
+inventory.bullets *= bulletsPerDollar
 
 // 1190
 print()
@@ -287,8 +288,8 @@ while (true) {
     inventory.cash = int(value: inventory.cash)
     M = int(value: M)
     
-    // M2 • TOTAL MILEAGE UP THROUGH PREVIOUS TURN
-    let M2 = M
+    // (mileageThroughPreviousTurn was "M2")
+    let mileageThroughPreviousTurn = M
     
     // sick or injured?
     if isIll || isInjured {
@@ -347,7 +348,8 @@ while (true) {
         func spend() -> Double {
             var P = readDouble()
             if P < 0 {
-                // keeping this interesting exploit
+                // This is how the original works. Spending negative amounts reduces your inventory
+                // and does not give you any cash!
                 return P
             }
             inventory.cash -= P
@@ -360,26 +362,28 @@ while (true) {
             P = 0
             return 0
         }
+        // Fort stores only give you 2/3 for your dollar.
+        let fortInflation = 2.0 / 3.0
         print("FOOD")
-        inventory.food += 2 / 3 * spend()
+        inventory.food += fortInflation * spend()
         print("AMMUNITION")
-        inventory.bullets = int(value: inventory.bullets + 2 / 3 * spend() * 50)
+        inventory.bullets = int(value: inventory.bullets + fortInflation * spend() * bulletsPerDollar)
         print("CLOTHING")
-        inventory.clothing += 2 / 3 * spend()
+        inventory.clothing += fortInflation * spend()
         print("MISCELLANEOUS SUPPLIES")
-        inventory.misc += 2 / 3 * spend()
+        inventory.misc += fortInflation * spend()
         M -= 45
     case Action.hunt:
         M -= 45
         // 2580 GOSUB 6140
-        var B1 = shoot()
-        if B1 > 1 {
-            if 100.0 * Double(rand.nextUniform()) < 13.0 * B1 {
+        var shotSpeed = shoot()
+        if shotSpeed > 1 {
+            if 100.0 * Double(rand.nextUniform()) < 13.0 * shotSpeed {
                 print("YOU MISSED---AND YOUR DINNER GOT AWAY.....")
             } else {
-                inventory.food += 48 - 2 * B1
+                inventory.food += 48 - 2 * shotSpeed
                 print("NICE SHOT--RIGHT ON TARGET--GOOD EATIN' TONIGHT!!")
-                inventory.bullets -= 10 + 3 * B1
+                inventory.bullets -= 10 + 3 * shotSpeed
             }
         } else {
             print("RIGHT BETWEEN THE EYES---YOU GOT A BIG ONE!!!!")
@@ -423,35 +427,35 @@ while (true) {
     // Actually advance along the trail!
     M += 200 + (inventory.animals - 220) / 5 + 10 * nextRandomFraction()
 
-    // FLAG FOR BLIZZARD
-    var L1 = 0
-    // FLAG FOR INSUFFICIENT CLOTHING IN COLD WEATHER
-    var C1 = 0
     // ***RIDERS ATTACK***
     let riderMileageSquare = pow(M / 100 - 4, 2)
     if nextRandomFraction() * 10 <= (riderMileageSquare + 72) / (riderMileageSquare + 12) - 1 {
         print("RIDERS AHEAD.  THEY ")
-        var S5 = 0
+        // (was "S5")
+        var isFriendly = false
         if rand.nextBool() {
             print("DON'T")
-            S5 = 1
+            isFriendly = true
         }
         print("LOOK HOSTILE")
         print("TACTICS")
-        // T1 = CHOICE OF TACTICS WHEN ATTACKED
-        var T1 = 0
-        while T1 < 1 || T1 > 4 {
+        // (was "T1")
+        enum Tactics: Int {
+            case invalid = 0, run, attack, continueOn, circleWagons
+        }
+        var tactics = Tactics.invalid
+        while tactics == Tactics.invalid {
             print("(1) RUN  (2) ATTACK  (3) CONTINUE  (4) CIRCLE WAGONS")
             if nextRandomFraction() <= 0.2 {
-                S5 = 1 - S5
+                isFriendly = !isFriendly
             }
-            T1 = readInt()
+            tactics = Tactics(rawValue: readInt()) ?? Tactics.invalid
         }
-        if S5 != 1 {
-            func shootRiders(B1: Double) {
-                if B1 <= 1 {
+        if !isFriendly {
+            func shootRiders(shotSpeed: Double) {
+                if shotSpeed <= 1 {
                     print("NICE SHOOTING---YOU DROVE THEM OFF")
-                } else if B1 > 5 {
+                } else if shotSpeed > 5 {
                     print("LOUSY SHOT---YOU GOT KNIFED")
                     isInjured = true
                     print("YOU HAVE TO SEE OL' DOC BLANCHARD")
@@ -459,19 +463,12 @@ while (true) {
                     print("KINDA SLOW WITH YOUR COLT .45")
                 }
             }
-            if T1 < 2 {
-                // run
-                M += 20
-                inventory.misc -= 15
-                inventory.bullets -= 150
-                inventory.animals -= 40
-            } else if T1 == 2 {
-                // attack
-                let B1 = shoot()
-                inventory.bullets -= B1 * 40 + 50
-                shootRiders(B1: B1)
-            } else if T1 == 3 {
-                // continue
+            switch tactics {
+            case Tactics.attack:
+                let shotSpeed = shoot()
+                inventory.bullets -= shotSpeed * 40 + 50
+                shootRiders(shotSpeed: shotSpeed)
+            case Tactics.continueOn:
                 if nextRandomFraction() <= 0.8 {
                     inventory.bullets -= 150
                     inventory.misc -= 15
@@ -479,31 +476,40 @@ while (true) {
                     // 3450
                     print("THEY DID NOT ATTACK")
                 }
-            } else {
-                // circle wagons
-                let B1 = shoot()
-                inventory.bullets -= B1 * 30 + 50
+            case Tactics.circleWagons:
+                let shotSpeed = shoot()
+                inventory.bullets -= shotSpeed * 30 + 50
                 M -= 25
-                shootRiders(B1: B1)
+                shootRiders(shotSpeed: shotSpeed)
+            default:
+                // run or invalid
+                M += 20
+                inventory.misc -= 15
+                inventory.bullets -= 150
+                inventory.animals -= 40
             }
             print("RIDERS WERE HOSTILE-- CHECK FOR LOSSES")
             if inventory.bullets < 0 {
                 print("YOU RAN OUT OF BULLETS AND GOT MASSACRED BY THE RIDERS")
                 die()
+                // I guess if you chose CONTINUE and they did not attack, they somehow sensed your
+                // lack of bullets, changed their minds, and attacked anyway?
             }
         } else {
             // not hostile
-            if T1 < 2 {
-                // run
+            switch tactics {
+            case Tactics.run:
+                // run or invalid
                 M += 15
                 inventory.animals -= 10
-            } else if T1 == 2 {
-                // attack
+            case Tactics.attack:
                 M -= 5
                 inventory.bullets -= 100
-            } else if T1 == 4 {
-                // circle wagons
+            case Tactics.circleWagons:
                 M -= 20
+            default:
+                // continueOn or invalid
+                break
             }
             print("RIDERS WERE FRIENDLY, BUT CHECK FOR POSSIBLE LOSSES")
         }
@@ -581,21 +587,21 @@ while (true) {
         } else {
             // 4490
             print("COLD WEATHER---BRRRRRRR!---YOU")
-            if inventory.clothing <= 22 + 4 * nextRandomFraction() {
+            var isUnderdressed = inventory.clothing <= 22 + 4 * nextRandomFraction()
+            if isUnderdressed {
                 print("DON'T")
-                C1 = 1
-            } // lse 4530
+            } // else 4530
             print("HAVE ENOUGH CLOTHING TO KEEP YOU WARM")
-            if C1 != 0 {
+            if isUnderdressed {
                 illness()
             }
         }
     case 32..<35:
         // 3960
         print("BANDITS ATTACK")
-        var B1 = shoot()
-        inventory.bullets -= 20 * B1
-        if inventory.bullets >= 0 && B1 <= 1 {
+        var shotSpeed = shoot()
+        inventory.bullets -= 20 * shotSpeed
+        if inventory.bullets >= 0 && shotSpeed <= 1 {
             // 4100
             print("QUICKEST DRAW OUTSIDE OF DODGE CITY!!!")
             print("YOU GOT 'EM!")
@@ -641,21 +647,21 @@ while (true) {
     case 54..<64:
         // 4340
         print("WILD ANIMALS ATTACK!")
-        var B1 = shoot()
+        var shotSpeed = shoot()
         if inventory.bullets < 40 {
             print("YOU WERE TOO LOW ON BULLETS")
             print("THE WOLVES OVERPOWERED YOU")
             isInjured = true
             dieOfInjuriesOrPneumonia(injuries: true)
         }
-        if B1 <= 2 {
+        if shotSpeed <= 2 {
             print("NICE SHOOTIN' PARDNER---THEY DIDN'T GET MUCH")
         } else {
             print("SLOW ON THE DRAW---THEY GOT AT YOUR FOOD AND CLOTHES")
         }
-        inventory.bullets -= 20 * B1
-        inventory.clothing -= B1 * 4
-        inventory.food -= B1 * 8
+        inventory.bullets -= 20 * shotSpeed
+        inventory.clothing -= shotSpeed * 4
+        inventory.food -= shotSpeed * 8
     case 64..<69:
         // 4560
         print("HAIL STORM---SUPPLIES DAMAGED")
@@ -684,8 +690,6 @@ while (true) {
     func blizzardInMountainPass() {
         // 4970
         print("BLIZZARD IN MOUNTAIN PASS--TIME AND SUPPLIES LOST")
-        // L1: flag for blizzard
-        L1 = 1
         inventory.food -= 25
         inventory.misc -= 10
         inventory.bullets -= 300
@@ -766,12 +770,13 @@ while (true) {
         clearSouthPass()
     }
     // 1230
-    if M >= 2040 {
+    let oregonCityDistance = 2040.0
+    if M >= oregonCityDistance {
         // 5420 ***FINAL TURN***
         // 5430
-        // F9: fraction of two weeks traveled on final turn
-        var F9 = (2040 - M2) / (M - M2)
-        let inverse = 1 - F9
+        // fraction of two weeks traveled on final turn (was "F9")
+        let fraction = (oregonCityDistance - mileageThroughPreviousTurn) / (M - mileageThroughPreviousTurn)
+        let inverse = 1 - fraction
         inventory.food += inverse * getFoodConsumedThisTurn()
         print()
         // 5470
@@ -780,11 +785,11 @@ while (true) {
         print("A REAL PIONEER!")
         print()
         // 5510
-        F9 = int(value:F9 * 14)
-        var day = turn * 14 + Int(F9)
-        F9 += 1
-        if F9 >= 8 {
-            F9 -= 7
+        var daysInFinalTurn = int(value:fraction * 14)
+        var day = turn * 14 + Int(daysInFinalTurn)
+        daysInFinalTurn += 1
+        if daysInFinalTurn >= 8 {
+            daysInFinalTurn -= 7
         }
         let daysOfWeek = [
             "MONDAY",
@@ -795,7 +800,7 @@ while (true) {
             "SATURDAY",
             "SUNDAY",
         ]
-        print("\(daysOfWeek[Int(F9)]) ")
+        print("\(daysOfWeek[Int(daysInFinalTurn)]) ")
         // 5700
         if day <= 124 {
             day -= 93
