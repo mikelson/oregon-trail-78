@@ -313,31 +313,29 @@ while (true) {
 
     inventory.printSummary()
     
-    var X: Int
+    // Let user choose an action for this turn
+    enum Action: Int {
+        case stopAtFort = 1, hunt, continueOn
+    }
+    var action: Action
     if isFortAvailable {
         isFortAvailable = false
         print("DO YOU WANT TO (1) STOP AT THE NEXT FORT, (2) HUNT,")
         print("OR (3) CONTINUE");
-        X = readInt()
-        if X < 1 || X > 3{
-            X = 3
-        }
+        action = Action(rawValue: readInt()) ?? Action.continueOn
     } else {
         print("DO YOU WANT TO (1) HUNT, OR (2) CONTINUE")
-        X = readInt()
-        if X != 1 {
-            X = 2
-        }
-        X += 1
-        if X == 2 && inventory.bullets < 40 {
+        let intRead = readInt()
+        action = intRead == 0 ? Action.continueOn : (Action(rawValue: intRead + 1) ?? Action.continueOn)
+        if action == Action.hunt && inventory.bullets < 40 {
             print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
-            X = 3
+            action = Action.continueOn
         }
         isFortAvailable = true
     }
     // 2270 switch
-    if X == 1 {
-        // ***STOPPING AT FORT***
+    switch action {
+    case Action.stopAtFort:
         print("ENTER WHAT YOU WISH TO SPEND ON THE FOLLOWING")
         func spend() -> Double {
             var P = readDouble()
@@ -364,12 +362,12 @@ while (true) {
         print("MISCELLANEOUS SUPPLIES")
         inventory.misc += 2 / 3 * spend()
         M -= 45
-    } else if X == 2 {
-        // ***HUNTING***
+    case Action.hunt:
         if inventory.bullets < 40 {
+            assert(isFortAvailable)
             print("TOUGH---YOU NEED MORE (at least 40) BULLETS TO GO HUNTING")
-            // Basic code is GOTO 2080, which could let you stop at fort, even if it is not a fort turn...
-            // TODO just don't show hunt option if inventory.bullets < 40
+            // Basic code is GOTO 2080, which lets you choose fort or continue instead
+            // TODO just don't show hunt option if inventory.bullets < 40, or loop until legal action picked, like BASIC
             // for now, just continue...
         } else {
             M -= 45
@@ -390,12 +388,15 @@ while (true) {
                 inventory.bullets -= 10 + nextRandomFraction() * 4
             }
         }
+    case Action.continueOn:
+        break
     }
-    // 2720 continuing on
+    
     if inventory.food < 13 {
         print("YOU RAN OUT OF FOOD AND STARVED TO DEATH")
         die()
     }
+
     // ***EATING***
     // Eating poorly (1) greatly increases the likelihood and severity of illness.
     // Eating well (3) decreases the probablity and severity of illness.
