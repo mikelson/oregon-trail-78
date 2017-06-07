@@ -200,8 +200,8 @@ class Inventory {
     
     func printSummary() {
         // Note that "animals" is not printed, even though I want to know sometimes.
-        print("FOOD\tBULLETS\tCLOTHING\tMISC. SUPP.\tCASH")
-        print("\(food)\t\t\(bullets)\t\(clothing)\t\t\t\(misc)\t\t\t\(cash)")
+        print("FOOD  BULLETS  CLOTHING  MISC. SUPP.  CASH")
+        print(String(format: "%4.0f  %7.0f  %8.0f  %11.0f  %4.0f", food, bullets, clothing, misc, cash))
     }
 }
 let inventory = Inventory()
