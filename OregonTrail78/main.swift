@@ -6,10 +6,18 @@
 //
 // Port of Creative Computing May-June 1978 Vol 4 No 3 pp 132 - 139 "Oregon Trail" by Dan Rawitsch
 //
+// PROGRAM NAME - OREGON VERSION 1 01/01/78
+// ORIGINAL PROGRAMMING BY BILL HEINEMANN - 1971
+// SUPPORT RESEARCH AND MATERIALS BY DON RAVITSCH.
+// CDC CYBER 70/73-26 BASIC 3.1
+// DOCUMENTATION BOOKLET 'OREQON' AVAILABLE FROM
+// MINNES0TA EDUCATIONAL COMPUTING CONSORTIUM STAFF
+// MECC SUPPORT SERVICES 2520 BROADWAY DRIVE ST. PAUL. MN 55113
 
 import Foundation
 import GameplayKit
 
+/// Read a line of text from the standard input and try to parse as an Int. Returns 0 on failure.
 func readInt() -> Int {
     let line = readLine()
     if line != nil {
@@ -18,6 +26,7 @@ func readInt() -> Int {
     return 0
 }
 
+/// Read a line of text from the standard input and try to parse as a Double. Returns 0.0 on failure.
 func readDouble() -> Double {
     let line = readLine()
     if line != nil {
@@ -26,7 +35,12 @@ func readDouble() -> Double {
     return 0.0
 }
 
-func int(value: Double) -> Double {
+
+/// Round off the decimels of a Double, rounding towards zero for negative values.
+///
+/// - Parameter value: value to round
+/// - Returns: value with fractional part subtracted off (or added for negative value)
+func int(_ value: Double) -> Double {
     if value < 0.0 {
         // round towards zero
         return floor(value) + 1
@@ -34,25 +48,26 @@ func int(value: Double) -> Double {
     return floor(value)
 }
 
+/// Display sad message and exit with code 0.
 func die() {
     // 5170
     print()
-    print("DUE T0 Y0UR UNFORTUNATE SITUATION, THERE ARE A FEW")
+    print("DUE T0 YOUR UNFORTUNATE SITUATION, THERE ARE A FEW")
     print("FORMALITIES WE MUST GO THROUGH")
     print("WOULD YOU LIKE A MINISTER?")
-    var C$ = readLine()
+    var lineRead = readLine()
     print("WOULD YOU LIKE A FANCY FUNERAL?")
-    C$ = readLine()
+    lineRead = readLine()
     print("WOULD YOU LIKE US TO INFORM YOUR NEXT OF KIN?")
-    C$ = readLine()
-    if C$ != "YES" {
+    lineRead = readLine()
+    if lineRead != "YES" {
         print("BUT YOUR AUNT SADIE IN ST. LOUIS IS REALLY WORRIED ABOUT YOU")
     } else {
         print("THAT WILL BE $4.50 FOR THE TELEGRAPH CHARGE.")    
     }
     print()
     print("WE THANK YOU FOR THIS INFORMATION AND WE ARE SORRY YOU")
-    print("DIDN'T MAKE IT TO THE GREAT TERRITORY 8F OREGON")
+    print("DIDN'T MAKE IT TO THE GREAT TERRITORY OF OREGON")
     print("BETTER LUCK NEXT TIME")
     print()
     print()
@@ -62,12 +77,15 @@ func die() {
     exit(0)
 }
 
+/// Display message about cause of death, and die.
 func dieOfInjuriesOrPneumonia(injuries: Bool) {
     // 5120
     print("YOU DIED OF ")
     print(injuries ? "INJURIES" : "PNEUMONIA")
     die()
 }
+
+/// Display message about cause of death, and die.
 
 func dieOfLackOfMedicalSupplies(injuries: Bool) {
     // 5110
@@ -76,17 +94,12 @@ func dieOfLackOfMedicalSupplies(injuries: Bool) {
 }
 
 let rand = GKARC4RandomSource()
+
+/// Return a Double within the uniform range [0.0...1.0].
 func nextRandomFraction() -> Double {
     return Double(rand.nextUniform())
 }
 
-// PROGRAM NAME - OREGON VERSION 1 01/01/78
-// ORIGINAL PROGRAMMING BY BILL HEINEMANN - 1971
-// SUPPORT RESEARCH AND MATERIALS BY DON RAVITSCH.
-// CDC CYBER 70/73-26 BASIC 3.1
-// DOCUMENTATION BOOKLET 'OREQON' AVAILABLE FROM
-// MINNES0TA EDUCATIONAL COMPUTING CONSORTIUM STAFF
-// MECC SUPPORT SERVICES 2520 BROADWAY DRIVE ST. PAUL. MN 55113
 print("DO YOU NEED INSTRUCTIONS (YES/NO)")
 
 if readLine() != "NO" {
@@ -145,6 +158,7 @@ print("ENTER ONE OF THE ABOVE -- THE BETTER YOU CLAIM YOU ARE, THE")
 print("FASTER YOU'LL HAVE TO BE WITH YOUR GUN TO BE SUCCESSFUL.")
 // ("shootingExpertise" was "D9")
 var shootingExpertise = readInt()
+
 if shootingExpertise > 5 {
     shootingExpertise = 5
 }
@@ -170,21 +184,39 @@ var isInjured = false
 
 // Can you visit a fort this turn? (Was "X1")
 var isFortAvailable = false
+
 // Do you have an illness? (Was "S4")
 var isIll = false
+
+// The first and only time you pass mileage 950, you face South Pass,
+// where there's a high probability of blizzard.
+// https://en.wikipedia.org/wiki/South_Pass_(Wyoming)
 // ("didClearSouthPass" was "F1")
 var didClearSouthPass = false
-// Flag for clearing Blue Mountains (was "F2")
-var didClearBlueMountains = false
-// Total mileage whole trip (was "M")
-var mileage = 0.0
+
 // Flag for clearing South Pass in setting mileage (was "M9")
 var showSouthPassMileageNext = false
+
+// The first and only time you pass mileage 1700, you face the Blue
+// Mountains, where there's again a high probability of blizzard.
+// https://en.wikipedia.org/wiki/Blue_Mountains_(Pacific_Northwest)
+// ("didClearBlueMountains" was "F2")
+var didClearBlueMountains = false
+
+// Total mileage whole trip (was "M")
+var mileage = 0.0
+
 // Turn number for setting date (was "D3")
 var turn = 0
 
+// 2 cents per bullet
+let bulletsPerDollar = 50.0
+
 // What's in your wagon?
 class Inventory {
+    static let wagonCost = 200.0
+    static let startingCash = 700.0
+    
     // Value of animals pulling the wagon, aka oxen (was "A")
     var animals = 0.0
     // Amount of food remaining (was "F")
@@ -196,8 +228,80 @@ class Inventory {
     // Amount spent on "miscellaneous supplies" - basically medicine (was "M1")
     var misc = 0.0
     // Cash dollars remaining (was "T")
-    var cash = 700.0
+    var cash = startingCash
     
+    init() {
+        // INITIAL PURCHASE
+        while true {
+            print()
+            print()
+            while true {
+                print("HOW MUCH DO YOU WANT TO SPEND ON YOUR OXEN TEAM")
+                animals = readDouble()
+                if animals < 200 {
+                    print("NOT ENOUGH")
+                    continue
+                }
+                if animals > 300 {
+                    print("TOO MUCH")
+                    continue
+                }
+                break;
+            }
+            
+            func readPositiveDouble(question: String) -> Double {
+                while true {
+                    print(question)
+                    let value = readDouble()
+                    if (value < 0.0) {
+                        print("IMPOSSIBLE")
+                        continue
+                    }
+                    return value;
+                }
+            }
+            food = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON FOOD")
+            
+            bullets = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON AMMUNITION")
+            
+            clothing = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON CLOTHING")
+            
+            misc = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON MISCELLANEOUS SUPPLIES")
+            
+            cash = Inventory.startingCash - animals - food - bullets - clothing - misc
+            if cash < 0 {
+                print("YOU OVERSPENT—YOU ONLY HAD $\(Int(Inventory.startingCash)) TO SPEND. BUY AGAIN")
+                continue
+            }
+            print("AFTER ALL YOUR PURCHASES, YOU NOW HAVE \(Int(cash)) DOLLARS LEFT")
+            break
+        }
+        bullets *= bulletsPerDollar
+    }
+    
+    /// Set most values to 0 if negative, and round all values down to nearest integer.
+    func resetNegativesAndFractions() {
+        if food < 0 {
+            food = 0
+        }
+        if bullets < 0 {
+            bullets = 0
+        }
+        if clothing < 0 {
+            clothing = 0
+        }
+        if misc < 0 {
+            misc = 0
+        }
+        // Original code does not check for negative cash here
+        food = int(food)
+        bullets = int(bullets)
+        clothing = int(clothing)
+        misc = int(misc)
+        cash = int(cash)
+    }
+
+    /// Display selected values and labels for the player.
     func printSummary() {
         // Note that "animals" is not printed, even though I want to know sometimes.
         print("FOOD  BULLETS  CLOTHING  MISC. SUPP.  CASH")
@@ -206,86 +310,56 @@ class Inventory {
 }
 let inventory = Inventory()
 
-// INITIAL PURCHASE
-while true {
-    print()
-    print()
-    while true {
-        print("HOW MUCH DO YOU WANT TO SPEND ON YOUR OXEN TEAM")
-        inventory.animals = readDouble()
-        if inventory.animals < 200 {
-            print("NOT ENOUGH")
-            continue
-        }
-        if inventory.animals > 300 {
-            print("TOO MUCH")
-            continue
-        }
-        break;
-    }
-    
-    func readPositiveDouble(question: String) -> Double {
-        while true {
-            print(question)
-            let value = readDouble()
-            if (value < 0.0) {
-                print("IMPOSSIBLE")
-                continue
-            }
-            return value;
-        }
-    }
-    inventory.food = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON FOOD")
-    
-    inventory.bullets = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON AMMUNITION")
-    
-    inventory.clothing = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON CLOTHING")
-    
-    inventory.misc = readPositiveDouble(question: "HOW MUCH DO YOU WANT TO SPEND ON MISCELLANEOUS SUPPLIES")
-    
-    inventory.cash = 700.0 - inventory.animals - inventory.food - inventory.bullets - inventory.clothing - inventory.misc
-    if inventory.cash < 0 {
-        print("YOU OVERSPENT—YOU ONLY HAD $700 TO SPEND. BUY AGAIN")
-        continue
-    }
-    print("AFTER ALL YOUR PURCHASES, YOU NOW HAVE \(inventory.cash) DOLLARS LEFT")
-    break
+let minEatingRate = 1
+func getFoodConsumption(eatingRate: Int) -> Double {
+    assert(eatingRate >= minEatingRate)
+    return Double(8 + 5 * eatingRate)
 }
-// 2 cents per bullet
-let bulletsPerDollar = 50.0
-inventory.bullets *= bulletsPerDollar
-
-// 1190
-print()
-print("MONDAY MARCH 29 1847")
-print()
 
 // Main Turn Loop
 while (true) {
+    print()
+    let validDates = [
+        "MARCH 29",
+        "APRIL 12",
+        "APRIL 26",
+        "MAY 10",
+        "MAY 24",
+        "JUNE 7",
+        "JUNE 21",
+        "JULY 5",
+        "JULY 19",
+        "AUGUST 2",
+        "AUGUST 16",
+        "AUGUST 31",
+        "SEPTEMBER 13",
+        "SEPTEMBER 27",
+        "OCTOBER 11",
+        "OCTOBER 25",
+        "NOVEMBER 8",
+        "NOVEMBER 22",
+        "DECEMBER 6",
+        "DECEMBER 20",
+        ]
+    if turn >= validDates.count {
+        print("YOU HAVE BEEN ON THE TRAIL TOO LONG  ------")
+        print("YOUR FAMILY DIES IN THE FIRST BLIZZARD OF WINTER")
+        die()
+    }
+    print("MONDAY \(validDates[turn]) 1847")
+    // 1730
+    print()
+
     // 1740
     // ***BEGINNING EACH TURN***
     // 1750
-    if inventory.food < 0 {
-        inventory.food = 0
-    }
-    if inventory.bullets < 0 {
-        inventory.bullets = 0
-    }
-    if inventory.clothing < 0 {
-        inventory.clothing = 0
-    }
-    if inventory.misc < 0 {
-        inventory.misc = 0
-    }
-    if inventory.food < 13 {
+    inventory.resetNegativesAndFractions()
+    
+    if inventory.food < getFoodConsumption(eatingRate: minEatingRate) {
         print("YOU'D BETTER DO SOME HUNTING OR BUY FOOD AND SOON!!!!")
     }
-    inventory.food = int(value: inventory.food)
-    inventory.bullets = int(value: inventory.bullets)
-    inventory.clothing = int(value: inventory.clothing)
-    inventory.misc = int(value: inventory.misc)
-    inventory.cash = int(value: inventory.cash)
-    mileage = int(value: mileage)
+
+    mileage = int(mileage)
     
     // (mileageThroughPreviousTurn was "M2")
     let mileageThroughPreviousTurn = mileage
@@ -304,11 +378,12 @@ while (true) {
         isIll = false
     }
     // 1990
+    let southPassMileage = 950.0
     if showSouthPassMileageNext {
-        print("TOTAL MILEAGE IS 950")
+        print("TOTAL MILEAGE IS \(Int(southPassMileage))")
         showSouthPassMileageNext = false
     } else {
-        print("TOTAL MILEAGE IS \(mileage)")
+        print("TOTAL MILEAGE IS \(Int(mileage))")
     }
 
     inventory.printSummary()
@@ -366,7 +441,7 @@ while (true) {
         print("FOOD")
         inventory.food += fortInflation * spend()
         print("AMMUNITION")
-        inventory.bullets = int(value: inventory.bullets + fortInflation * spend() * bulletsPerDollar)
+        inventory.bullets = int(inventory.bullets + fortInflation * spend() * bulletsPerDollar)
         print("CLOTHING")
         inventory.clothing += fortInflation * spend()
         print("MISCELLANEOUS SUPPLIES")
@@ -394,7 +469,7 @@ while (true) {
         break
     }
     
-    if inventory.food < 13 {
+    if inventory.food < getFoodConsumption(eatingRate: minEatingRate) {
         print("YOU RAN OUT OF FOOD AND STARVED TO DEATH")
         die()
     }
@@ -403,18 +478,16 @@ while (true) {
     // Eating poorly (1) greatly increases the likelihood and severity of illness.
     // Eating well (3) decreases the probablity and severity of illness.
     var eatingRate = 0
-    func getFoodConsumedThisTurn() -> Double {
-        return Double(8 + 5 * eatingRate)
-    }
+    
     while true {
         print("DO YOU WANT TO EAT (1) POORLY  (2) MODERATELY")
         print("OR (3) WELL")
         eatingRate = readInt()
-        if eatingRate < 1 || eatingRate > 3 {
+        if eatingRate < minEatingRate || eatingRate > 3 {
             continue
         }
         // Consume 13, 18, or 23 foods
-        let food = inventory.food - getFoodConsumedThisTurn()
+        let food = inventory.food - getFoodConsumption(eatingRate: eatingRate)
         if food < 0.0 {
             print("YOU CAN'T EAT THAT WELL")
             continue
@@ -518,14 +591,14 @@ while (true) {
         // 6290 REM ***ILLNESS SUB-ROUTINE***
         // 6300
         // 10, 45, or 80
-        var percent = 10 + 35.0 * Double(eatingRate - 1)
+        var percent = 10 + 35.0 * Double(eatingRate - minEatingRate)
         if 100 * nextRandomFraction() < percent {
             print("MILD ILLNESS---MEDICINE USED")
             mileage -= 5
             inventory.misc -= 2
         } else {
             // 60, 90, or 97.5
-            percent = 100.0 - (40.0 / pow(4.0, Double(eatingRate) - 1.0))
+            percent = 100.0 - (40.0 / pow(4.0, Double(eatingRate - minEatingRate)))
             if 100 * nextRandomFraction() < percent {
                 print("BAD ILLNESS---MEDICINE USED")
                 mileage -= 5
@@ -577,7 +650,7 @@ while (true) {
         mileage -= 10 * nextRandomFraction() + 2
     case 22..<32:
         // 3880
-        if mileage <= 950 {
+        if mileage <= southPassMileage {
             print("HEAVY RAINS---TIME AND SUPPLIES LOST")
             inventory.food -= 10
             inventory.bullets -= 500
@@ -669,14 +742,17 @@ while (true) {
         inventory.misc -= 4 + nextRandomFraction() * 3
     case 69..<95:
         // 4610
-        if eatingRate == 1 {
+        switch eatingRate {
+        case minEatingRate:
             illness()
-        } else if eatingRate != 3 {
+        case minEatingRate + 1:
             if nextRandomFraction() > 0.25 {
                 illness()
             }
-        } else if nextRandomFraction() < 0.5 {
-            illness()
+        default:
+            if nextRandomFraction() < 0.5 {
+                illness()
+            }
         }
     case 95..<100:
         // 4670
@@ -711,7 +787,7 @@ while (true) {
             }
         }
         // 4940
-        if mileage <= 950 {
+        if mileage <= southPassMileage {
             showSouthPassMileageNext = true
         }
     }
@@ -734,7 +810,7 @@ while (true) {
     
     // 4700 ***MOUNTAINS***
     // 4710
-    if mileage > 950 {
+    if mileage > southPassMileage {
         // 4720
         var square = pow(mileage / 100 - 15, 2.0)
         // At mileage==950, nextRandomFraction()*10 must be <= 6.58 for rugged mountains
@@ -776,7 +852,7 @@ while (true) {
         // fraction of two weeks traveled on final turn (was "F9")
         let fraction = (oregonCityDistance - mileageThroughPreviousTurn) / (mileage - mileageThroughPreviousTurn)
         let inverse = 1 - fraction
-        inventory.food += inverse * getFoodConsumedThisTurn()
+        inventory.food += inverse * getFoodConsumption(eatingRate: eatingRate)
         print()
         // 5470
         print("YOU FINALLY ARRIVED AT OREGON CITY")
@@ -784,7 +860,7 @@ while (true) {
         print("A REAL PIONEER!")
         print()
         // 5510
-        var daysInFinalTurn = int(value:fraction * 14)
+        var daysInFinalTurn = int(fraction * 14)
         var day = turn * 14 + Int(daysInFinalTurn)
         daysInFinalTurn += 1
         if daysInFinalTurn >= 8 {
@@ -822,11 +898,8 @@ while (true) {
         }
         // 5920
         print()
-        inventory.bullets = max(inventory.bullets, 0)
-        inventory.clothing = max(inventory.clothing, 0)
-        inventory.misc = max(inventory.misc, 0)
+        inventory.resetNegativesAndFractions()
         inventory.cash = max(inventory.cash, 0)
-        inventory.food = max(inventory.food, 0)
         inventory.printSummary()
         print()
         print("           PRESIDENT JAMES K. POLK SENDS YOU HIS")
@@ -839,34 +912,4 @@ while (true) {
     }
     // 1240 ***SETTING DATE***
     turn += 1
-    print()
-    let validDates = [
-        "APRIL 12",
-        "APRIL 26",
-        "MAY 10",
-        "MAY 24",
-        "JUNE 7",
-        "JUNE 21",
-        "JULY 5",
-        "JULY 19",
-        "AUGUST 2",
-        "AUGUST 16",
-        "AUGUST 31",
-        "SEPTEMBER 13",
-        "SEPTEMBER 27",
-        "OCTOBER 11",
-        "OCTOBER 25",
-        "NOVEMBER 8",
-        "NOVEMBER 22",
-        "DECEMBER 6",
-        "DECEMBER 20",
-    ]
-    if turn >= validDates.count {
-        print("YOU HAVE BEEN ON THE TRAIL TOO LONG  ------")
-        print("YOUR FAMILY DIES IN THE FIRST BLIZZARD OF WINTER")
-        die()
-    }
-    print("MONDAY \(validDates[turn]) 1847")
-    // 1730
-    print()
 } // end of main turn loop
