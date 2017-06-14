@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B49B6AE61EF0986400153337 /* input.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B6AE51EF0986400153337 /* input.swift */; };
+		B49B6AE81EF098BA00153337 /* utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B6AE71EF098BA00153337 /* utilities.swift */; };
+		B49B6AEA1EF0992D00153337 /* death.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B6AE91EF0992D00153337 /* death.swift */; };
+		B49B6AEC1EF09C7300153337 /* instructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B6AEB1EF09C7300153337 /* instructions.swift */; };
+		B49B6AEE1EF09D1E00153337 /* shooting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B6AED1EF09D1E00153337 /* shooting.swift */; };
+		B49B6AF01EF09DE600153337 /* inventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B6AEF1EF09DE600153337 /* inventory.swift */; };
+		B49B6AF21EF09FE300153337 /* turn.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49B6AF11EF09FE300153337 /* turn.swift */; };
 		B4F37C581ECD4F44002450C2 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4F37C571ECD4F44002450C2 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -23,9 +30,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B49B6AE51EF0986400153337 /* input.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = input.swift; sourceTree = "<group>"; };
+		B49B6AE71EF098BA00153337 /* utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = utilities.swift; sourceTree = "<group>"; };
+		B49B6AE91EF0992D00153337 /* death.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = death.swift; sourceTree = "<group>"; };
+		B49B6AEB1EF09C7300153337 /* instructions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = instructions.swift; sourceTree = "<group>"; };
+		B49B6AED1EF09D1E00153337 /* shooting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = shooting.swift; sourceTree = "<group>"; };
+		B49B6AEF1EF09DE600153337 /* inventory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = inventory.swift; sourceTree = "<group>"; };
+		B49B6AF11EF09FE300153337 /* turn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = turn.swift; sourceTree = "<group>"; };
 		B4F37C541ECD4F44002450C2 /* OregonTrail78 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OregonTrail78; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4F37C571ECD4F44002450C2 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		B4F37C5E1ECD6308002450C2 /* test-input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-input.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,7 +72,13 @@
 			isa = PBXGroup;
 			children = (
 				B4F37C571ECD4F44002450C2 /* main.swift */,
-				B4F37C5E1ECD6308002450C2 /* test-input.txt */,
+				B49B6AEF1EF09DE600153337 /* inventory.swift */,
+				B49B6AEB1EF09C7300153337 /* instructions.swift */,
+				B49B6AE91EF0992D00153337 /* death.swift */,
+				B49B6AE51EF0986400153337 /* input.swift */,
+				B49B6AE71EF098BA00153337 /* utilities.swift */,
+				B49B6AED1EF09D1E00153337 /* shooting.swift */,
+				B49B6AF11EF09FE300153337 /* turn.swift */,
 			);
 			path = OregonTrail78;
 			sourceTree = "<group>";
@@ -123,6 +142,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B49B6AEE1EF09D1E00153337 /* shooting.swift in Sources */,
+				B49B6AF01EF09DE600153337 /* inventory.swift in Sources */,
+				B49B6AEA1EF0992D00153337 /* death.swift in Sources */,
+				B49B6AEC1EF09C7300153337 /* instructions.swift in Sources */,
+				B49B6AE81EF098BA00153337 /* utilities.swift in Sources */,
+				B49B6AE61EF0986400153337 /* input.swift in Sources */,
+				B49B6AF21EF09FE300153337 /* turn.swift in Sources */,
 				B4F37C581ECD4F44002450C2 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
