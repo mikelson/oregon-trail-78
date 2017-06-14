@@ -1,7 +1,7 @@
 # oregon-trail-78
 The immortal Oregon Trail game, ported from the 1978 BASIC version to a Swift console application.
 
-If you are on macOS, you can download the executable and play the game. Double-click the file, or execute it from the Terminal command line and it will run in your Terminal tab.
+If you are on macOS, you can download the executable and play the game. Depending on your system preferences (because it is ad hoc signed), it may run if you double-click the file. Or execute it from the Terminal command line and it will run in your Terminal tab; you may have to set the file permissions to make it executable (chmod +x).
 https://github.com/mikelson/oregon-trail-78/blob/master/Build/Release/OregonTrail78
 
 This is a port of a computer game published in Creative Computing May-June 1978 Vol 4 No 3 pp 132 - 139 "Oregon Trail" by Dan Rawitsch,
